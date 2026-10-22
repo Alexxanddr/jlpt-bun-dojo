@@ -209,3 +209,93 @@ def test_wrong_language_is_not_saved(authenticated, monkeypatch):
     with connect() as db:
         assert db.execute("SELECT COUNT(*) FROM sentences").fetchone()[0] == before
         assert db.execute("SELECT COUNT(*) FROM exercises").fetchone()[0] == 0
+
+
+def test_review_translation_preserves_sentence_and_schedule(authenticated, monkeypatch):
+    import json
+
+    with connect() as db:
+        db.execute("INSERT INTO sentences VALUES (?,?,?,?,?,?)", (
+            "generated-translation-case", db.execute("SELECT id FROM grammar LIMIT 1").fetchone()[0], None, "I am a student.",
+            json.dumps(["学生です。"]), "AI-generated; unreviewed"))
+        db.execute("INSERT INTO reviews VALUES (?, 1, 1, 2.5, 0)", ("generated-translation-case",))
+
+    async def generate(*args, **kwargs):
+        assert kwargs["reference"] == ["学生です。"]
+        return Generated(prompt="Sono uno studente.", references=["学生です。"])
+
+    async def evaluate(*args, **kwargs):
+        return evaluation()
+
+    monkeypatch.setattr(AIClient, "generate", generate)
+    monkeypatch.setattr(AIClient, "evaluate", evaluate)
+    response = authenticated.post("/api/exercises", json={"mode": "review", "language": "it"})
+    assert response.status_code == 200
+    exercise = response.json()
+    with connect() as db:
+        assert db.execute("SELECT sentence_id FROM exercises WHERE id=?", (exercise["id"],)).fetchone()[0] == "generated-translation-case"
+    assert authenticated.post("/api/answers", json={"exercise_id": exercise["id"], "answer": "学生です。"}).status_code == 200
+    with connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM reviews").fetchone()[0] == 1
+        assert db.execute("SELECT repetitions FROM reviews").fetchone()[0] == 2
+
+
+def test_hint_during_evaluation_is_counted(authenticated, monkeypatch):
+    exercise = authenticated.post("/api/exercises", json={}).json()
+
+    async def evaluate(*args, **kwargs):
+        await module.hint(exercise["id"])
+        return evaluation()
+
+    monkeypatch.setattr(AIClient, "evaluate", evaluate)
+    result = authenticated.post("/api/answers", json={"exercise_id": exercise["id"], "answer": "学生です。"})
+    assert result.status_code == 200
+    assert result.json()["quality"] <= 2
+    assert authenticated.get("/api/stats").json()["axes"]["independence"] == 0
+
+
+def test_due_review_journal_resolution_and_saved_key_retention(authenticated, monkeypatch):
+    async def evaluate(*args, **kwargs):
+        result = evaluation()
+        result.suggestions = ["Ripassa questa costruzione."]
+        return result
+    monkeypatch.setattr(AIClient, "evaluate", evaluate)
+    config = authenticated.get("/api/settings").json()["settings"]
+    config["openai_api_key"] = "private-test-key"
+    assert authenticated.put("/api/settings", json=config).status_code == 200
+    config["openai_api_key"] = ""
+    assert authenticated.put("/api/settings", json=config).status_code == 200
+    assert module.load_settings().openai_api_key == "private-test-key"
+    assert "private-test-key" not in authenticated.get("/api/settings").text
+    exercise = authenticated.post("/api/exercises", json={}).json()
+    assert authenticated.post("/api/answers", json={"exercise_id": exercise["id"], "answer": "学生です。"}).status_code == 200
+    grammar_id = authenticated.get("/api/journal").json()[0]["grammar_id"]
+    assert authenticated.post(f"/api/journal/{grammar_id}/resolve", json={}).status_code == 200
+    assert authenticated.get("/api/journal").json()[0]["resolved"] == 1
+    with connect() as db:
+        db.execute("UPDATE reviews SET due=0")
+    assert authenticated.get("/api/stats").json()["due"] == 1
+    review = authenticated.post("/api/exercises", json={"mode": "review"}).json()
+    assert authenticated.post("/api/answers", json={"exercise_id": review["id"], "answer": "学生です。"}).status_code == 200
+    stats = authenticated.get("/api/stats").json()
+    assert stats["due"] == 0 and stats["axes"]["recall"] == 100
+    assert authenticated.get("/api/journal").json()[0]["resolved"] == 0
+    assert authenticated.post("/api/logout", json={}).status_code == 200
+    assert authenticated.get("/api/history").status_code == 401
+
+
+def test_partial_mcp_sync_keeps_successful_source_usable(authenticated, monkeypatch):
+    config = authenticated.get("/api/settings").json()["settings"]
+    config["mcp_enabled"] = True
+    authenticated.put("/api/settings", json=config)
+    item = {"source": "wanikani", "evidence": {"subject_type": "vocabulary", "characters": "学生"}}
+    monkeypatch.setattr(module, "weakness_cache", {"items": [], "unavailable": []})
+    async def sync():
+        return {"items": [item], "unavailable": ["bunpro"]}
+    async def generate(*args, **kwargs):
+        return Generated(prompt="Sono uno studente.", references=["学生です。"])
+    monkeypatch.setattr(module, "all_weaknesses", sync)
+    monkeypatch.setattr(AIClient, "generate", generate)
+    response = authenticated.post("/api/mcp/sync", json={})
+    assert response.json() == {"items": [item], "unavailable": ["bunpro"]}
+    assert authenticated.post("/api/exercises", json={"mode": "targeted"}).status_code == 200

@@ -261,12 +261,17 @@ async def exercise(value: ExerciseRequest):
         if any(deterministic(ref, refs, vocab, kanji, grammar["pattern"])["findings"] for ref in refs):
             logger.warning("Generation rejected by N5 checks after adapter validation")
             raise HTTPException(422, "generated_outside_dataset")
-        sentence["id"] = "generated-" + secrets.token_hex(12)
-        sentence["attribution"] = "AI-generated; unreviewed"
-        with connect() as db:
-            db.execute("INSERT INTO sentences VALUES (?,?,?,?,?,?)", (
-                sentence["id"], grammar["id"], prompt if value.language == "it" else None,
-                prompt if value.language == "en" else None, json.dumps(refs), "AI-generated; unreviewed"))
+        if value.generate or value.mode == "targeted":
+            sentence["id"] = "generated-" + secrets.token_hex(12)
+            sentence["attribution"] = "AI-generated; unreviewed"
+            with connect() as db:
+                db.execute("INSERT INTO sentences VALUES (?,?,?,?,?,?)", (
+                    sentence["id"], grammar["id"], prompt if value.language == "it" else None,
+                    prompt if value.language == "en" else None, json.dumps(refs), sentence["attribution"]))
+        else:
+            # Translation belongs to this exercise; keep the original review identity and references.
+            refs = json.loads(sentence["refs"])
+            sentence["attribution"] += "; AI-translated prompt; unreviewed"
     eid = secrets.token_hex(16)
     with connect() as db:
         db.execute("INSERT INTO exercises(id,sentence_id,language,prompt,refs,mode,context,created_at) VALUES (?,?,?,?,?,?,?,?)", (
@@ -311,7 +316,9 @@ async def answer(value: AnswerRequest):
         accepted = evaluation.accepted and not hard_errors
         score = min(evaluation.scores.model_dump().values())
         quality = min(2, score // 20) if not accepted else max(3, min(5, score // 20))
-        used_hint = bool(value.hinted or e["hinted"])
+        with connect() as db:
+            used_hint = bool(value.hinted or db.execute(
+                "SELECT hinted FROM exercises WHERE id=?", (e["id"],)).fetchone()[0])
         if used_hint:
             quality = min(quality, 2)
         result = {"checks": checks, "ai": evaluation.model_dump(), "accepted": accepted,

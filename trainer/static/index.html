@@ -1,21 +1,405 @@
 <!doctype html>
 <html lang="it">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JLPT Bun Dojo</title><link rel="stylesheet" href="/static/style.css"><script type="module" src="/static/app.js"></script></head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JLPT Bun Dojo</title>
+<link rel="stylesheet" href="/static/style.css">
+<script type="module" src="/static/app.js">
+</script>
+</head>
 <body>
-<header><a class="brand" href="/" aria-label="JLPT Bun Dojo"><span lang="ja">文道場</span><span>JLPT Bun Dojo</span></a><nav id="nav" hidden><button data-view="practice" data-i18n="practice"></button><button data-view="history" data-i18n="history"></button><button data-view="journal" data-i18n="journal"></button><button data-view="stats" data-i18n="stats"></button><button data-view="settings" data-i18n="settings"></button></nav><select id="ui-language" aria-label="Lingua / Language"><option value="it">Italiano</option><option value="en">English</option></select></header>
-<main>
-<p id="notice" role="status" aria-live="polite"></p>
-<section id="login"><h1 data-i18n="welcome"></h1><p data-i18n="intro"></p><form id="login-form"><label for="password" data-i18n="password"></label><input id="password" type="password" autocomplete="current-password" required minlength="16"><button class="primary" data-i18n="login"></button></form></section>
-<section id="practice" hidden>
-<div class="page-heading"><div><h1 data-i18n="practiceTitle"></h1><p data-i18n="practiceIntro"></p></div><span class="stamp" lang="ja">日本語<br>N5</span></div>
-<form id="exercise-form" class="toolbar"><label><span data-i18n="sourceLanguage"></span><select id="source-language"><option value="it">Italiano</option><option value="en">English</option></select></label><label><span data-i18n="category"></span><select id="category"></select></label><label><span data-i18n="mode"></span><select id="mode"><option value="new" data-i18n="new"></option><option value="review" data-i18n="review"></option><option value="cram" data-i18n="cram"></option><option value="targeted" data-i18n="targeted"></option></select></label><label><span data-i18n="difficulty"></span><select id="difficulty"><option value="easy" data-i18n="easy"></option><option value="standard" data-i18n="standard"></option><option value="challenging" data-i18n="challenging"></option></select></label><label class="checkbox"><input id="generate" type="checkbox"><span data-i18n="generate"></span></label><button class="primary" data-i18n="next"></button></form>
-<div id="exercise-empty" class="empty" data-i18n="exerciseEmpty"></div>
-<article id="exercise" hidden><div class="exercise-meta"><span><span id="grammar-label"></span> · <span id="difficulty-label"></span></span><span id="attribution"></span></div><h2 id="prompt"></h2><p id="grammar-description"></p><form id="answer-form"><label for="answer" data-i18n="yourAnswer"></label><textarea id="answer" lang="ja" maxlength="500" rows="4" required autocomplete="off" spellcheck="false"></textarea><div class="answer-actions"><button class="primary" id="grade" data-i18n="grade"></button><button type="button" id="hint" data-i18n="hint"></button><span id="char-count">0 / 500</span></div></form><p id="hint-text" class="japanese" lang="ja"></p><div id="weaknesses"></div></article>
-<section id="feedback" hidden aria-live="polite"><h2 id="verdict"></h2><div id="scores" class="scores"></div><h3 data-i18n="certainChecks"></h3><p data-i18n="scopeNote"></p><ul id="findings"></ul><h3 data-i18n="aiFeedback"></h3><p id="explanation"></p><ul id="suggestions"></ul><h3 data-i18n="corrections"></h3><div id="corrections" class="japanese" lang="ja"></div><h3 data-i18n="variants"></h3><div id="variants" class="japanese" lang="ja"></div><p id="next-review"></p></section>
+<a class="skip-link" href="#main" data-i18n="skipContent">
+</a>
+<header class="sidebar">
+  <a class="brand" href="/" aria-label="JLPT Bun Dojo">
+<span class="brand-mark" lang="ja">文</span>
+<span>Bun Dojo<small>JLPT N5</small>
+</span>
+</a>
+  <nav id="nav" hidden aria-label="Main navigation">
+    <button data-view="practice">
+<span aria-hidden="true">筆</span>
+<span data-i18n="practice">
+</span>
+</button>
+    <button data-view="history">
+<span aria-hidden="true">録</span>
+<span data-i18n="history">
+</span>
+</button>
+    <button data-view="journal">
+<span aria-hidden="true">学</span>
+<span data-i18n="navJournal">
+</span>
+</button>
+    <button data-view="stats">
+<span aria-hidden="true">進</span>
+<span data-i18n="stats">
+</span>
+</button>
+    <button data-view="settings">
+<span aria-hidden="true">設</span>
+<span data-i18n="settings">
+</span>
+</button>
+  </nav>
+  <div class="sidebar-bottom">
+<p data-i18n="sidebarNote">
+</p>
+<label>
+<span data-i18n="uiLanguage">
+</span>
+<select id="ui-language" aria-label="Lingua / Language">
+<option value="it">Italiano</option>
+<option value="en">English</option>
+</select>
+</label>
+</div>
+</header>
+<main id="main" tabindex="-1">
+<p id="notice" role="status" aria-live="polite">
+</p>
+<section id="login">
+<h1 data-i18n="welcome">
+</h1>
+<p data-i18n="intro">
+</p>
+<form id="login-form">
+<label for="password" data-i18n="password">
+</label>
+<input id="password" type="password" autocomplete="current-password" required minlength="16">
+<button class="primary" data-i18n="login">
+</button>
+</form>
 </section>
-<section id="history" hidden><h1 data-i18n="history"></h1><div id="history-list"></div></section>
-<section id="journal" hidden><h1 data-i18n="journal"></h1><p data-i18n="journalIntro"></p><div id="journal-list"></div></section>
-<section id="stats" hidden><h1 data-i18n="stats"></h1><p id="stats-summary"></p><div class="stats-layout"><div id="radar"></div><div id="stats-axes"></div></div><p data-i18n="statsNote"></p><div id="grammar-stats"></div><h2 data-i18n="dataSources"></h2><div id="sources"></div><h2 data-i18n="weaknesses"></h2><div id="stats-weaknesses"></div></section>
-<section id="settings" hidden><h1 data-i18n="settings"></h1><form id="settings-form"><div class="settings-grid"><label><span data-i18n="sourceLanguage"></span><select name="language"><option value="it">Italiano</option><option value="en">English</option></select></label><label><span data-i18n="uiLanguage"></span><select name="ui_language"><option value="it">Italiano</option><option value="en">English</option></select></label><label><span data-i18n="category"></span><select name="category" id="settings-category"></select></label></div><fieldset><legend data-i18n="connection"></legend><label><span data-i18n="endpoint"></span><input name="openai_base_url" type="url" required maxlength="500"></label><div class="settings-grid"><label><span data-i18n="openaiApiKey"></span><input name="openai_api_key" type="password" maxlength="1000" autocomplete="new-password" placeholder="••••••••"></label><label><span data-i18n="openrouterApiKey"></span><input name="openrouter_api_key" type="password" maxlength="1000" autocomplete="new-password" placeholder="••••••••"></label></div></fieldset><div class="settings-grid"><fieldset><legend data-i18n="generation"></legend><label><span data-i18n="provider"></span><select name="generation_provider"><option value="openai">OpenAI-compatible</option><option value="openrouter">OpenRouter</option></select></label><label><span data-i18n="model"></span><input name="generation_model" required maxlength="200"></label><label><span data-i18n="temperature"></span><input name="generation_temperature" type="number" min="0" max="2" step="0.1" required></label><label><span data-i18n="maxTokens"></span><input name="generation_max_tokens" type="number" min="128" max="8192" required></label></fieldset><fieldset><legend data-i18n="evaluation"></legend><label><span data-i18n="provider"></span><select name="evaluation_provider"><option value="openai">OpenAI-compatible</option><option value="openrouter">OpenRouter</option></select></label><label><span data-i18n="model"></span><input name="evaluation_model" required maxlength="200"></label><label><span data-i18n="temperature"></span><input name="evaluation_temperature" type="number" min="0" max="2" step="0.1" required></label><label><span data-i18n="maxTokens"></span><input name="evaluation_max_tokens" type="number" min="128" max="8192" required></label></fieldset></div><p data-i18n="serverConfig"></p><dl id="provider-status"></dl><label class="checkbox"><input type="checkbox" name="mcp_enabled"><span data-i18n="enableMcp"></span></label><p data-i18n="mcpNote"></p><div class="answer-actions"><button class="primary" data-i18n="save"></button><button type="button" id="sync" data-i18n="sync"></button><button type="button" id="logout" data-i18n="logout"></button></div></form></section>
-</main><footer data-i18n="footer"></footer>
-</body></html>
+<section id="practice" hidden>
+<div class="page-heading">
+<div>
+<h1 data-i18n="practiceTitle">
+</h1>
+<p data-i18n="practiceIntro">
+</p>
+</div>
+<span class="level-badge">日本語 <b>N5</b>
+</span>
+</div>
+<div class="practice-layout">
+<aside class="practice-options">
+<form id="exercise-form" class="toolbar">
+<details id="session-options" open>
+<summary data-i18n="sessionOptions"></summary>
+<div class="option-fields">
+<label>
+<span data-i18n="sourceLanguage">
+</span>
+<select id="source-language">
+<option value="it">Italiano</option>
+<option value="en">English</option>
+</select>
+</label>
+<label>
+<span data-i18n="category">
+</span>
+<select id="category">
+</select>
+</label>
+<label>
+<span data-i18n="mode">
+</span>
+<select id="mode">
+<option value="new" data-i18n="new">
+</option>
+<option value="review" data-i18n="review">
+</option>
+<option value="cram" data-i18n="cram">
+</option>
+<option value="targeted" data-i18n="targeted">
+</option>
+</select>
+</label>
+<label>
+<span data-i18n="difficulty">
+</span>
+<select id="difficulty">
+<option value="easy" data-i18n="easy">
+</option>
+<option value="standard" data-i18n="standard" selected>
+</option>
+<option value="challenging" data-i18n="challenging">
+</option>
+</select>
+</label>
+<label class="checkbox">
+<input id="generate" type="checkbox">
+<span data-i18n="generate">
+</span>
+</label>
+</div>
+<p id="mode-help" class="help"></p>
+<p class="help" data-i18n="optionsNext"></p>
+</details>
+<button data-i18n="next"></button>
+</form>
+
+</aside>
+<div class="writing-workspace">
+<div id="exercise-empty" class="empty">
+<span class="empty-mark" lang="ja" aria-hidden="true">書く</span>
+<h2 data-i18n="emptyTitle">
+</h2>
+<p data-i18n="exerciseEmpty">
+</p>
+<div class="study-steps">
+<span data-i18n="stepRead">
+</span>
+<span data-i18n="stepWrite">
+</span>
+<span data-i18n="stepReview">
+</span>
+</div>
+</div>
+<article id="exercise" hidden>
+<div class="exercise-meta">
+<span>
+<span id="grammar-label">
+</span> · <span id="difficulty-label">
+</span>
+</span>
+<span id="attribution">
+</span>
+</div>
+<h2 id="prompt">
+</h2>
+<p id="grammar-description">
+</p>
+<form id="answer-form">
+<label for="answer" data-i18n="yourAnswer">
+</label>
+<textarea id="answer" lang="ja" maxlength="500" rows="4" required autocomplete="off" spellcheck="false">
+</textarea>
+<div class="answer-actions">
+<button class="primary" id="grade" data-i18n="grade">
+</button>
+<button type="button" id="hint" data-i18n="hint">
+</button>
+<span id="char-count">0 / 500</span>
+</div>
+</form>
+<p id="hint-text" class="japanese" lang="ja">
+</p>
+<div id="weaknesses">
+</div>
+</article>
+<section id="feedback" hidden aria-live="polite">
+<h2 id="verdict">
+</h2>
+<div id="scores" class="scores">
+</div>
+<h3 data-i18n="certainChecks">
+</h3>
+<p data-i18n="scopeNote">
+</p>
+<ul id="findings">
+</ul>
+<h3 data-i18n="aiFeedback">
+</h3>
+<p id="explanation">
+</p>
+<ul id="suggestions">
+</ul>
+<div id="corrections-section">
+<h3 data-i18n="corrections">
+</h3>
+<div id="corrections" class="japanese" lang="ja">
+</div>
+</div>
+<div id="variants-section">
+<h3 data-i18n="variants">
+</h3>
+<div id="variants" class="japanese" lang="ja">
+</div>
+</div>
+<p id="next-review">
+</p>
+</section>
+</div>
+</div>
+</section>
+<section id="history" hidden>
+<h1 data-i18n="history">
+</h1>
+<div id="history-list">
+</div>
+</section>
+<section id="journal" hidden>
+<h1 data-i18n="journal">
+</h1>
+<p data-i18n="journalIntro">
+</p>
+<div id="journal-list">
+</div>
+</section>
+<section id="stats" hidden>
+<h1 data-i18n="stats">
+</h1>
+<p id="stats-summary">
+</p>
+<div class="stats-layout">
+<div id="radar">
+</div>
+<div id="stats-axes">
+</div>
+</div>
+<p data-i18n="statsNote">
+</p>
+<div id="grammar-stats">
+</div>
+<h2 data-i18n="dataSources">
+</h2>
+<div id="sources">
+</div>
+<h2 data-i18n="weaknesses">
+</h2>
+<div id="stats-weaknesses">
+</div>
+</section>
+<section id="settings" hidden>
+<h1 data-i18n="settings">
+</h1>
+<form id="settings-form">
+<div class="settings-grid">
+<label>
+<span data-i18n="sourceLanguage">
+</span>
+<select name="language">
+<option value="it">Italiano</option>
+<option value="en">English</option>
+</select>
+</label>
+<label>
+<span data-i18n="uiLanguage">
+</span>
+<select name="ui_language">
+<option value="it">Italiano</option>
+<option value="en">English</option>
+</select>
+</label>
+<label>
+<span data-i18n="category">
+</span>
+<select name="category" id="settings-category">
+</select>
+</label>
+</div>
+<fieldset>
+<legend data-i18n="connection">
+</legend>
+<label>
+<span data-i18n="endpoint">
+</span>
+<input name="openai_base_url" type="url" required maxlength="500">
+</label>
+<div class="settings-grid">
+<label>
+<span data-i18n="openaiApiKey">
+</span>
+<input name="openai_api_key" type="password" maxlength="1000" autocomplete="new-password" placeholder="••••••••">
+</label>
+<label>
+<span data-i18n="openrouterApiKey">
+</span>
+<input name="openrouter_api_key" type="password" maxlength="1000" autocomplete="new-password" placeholder="••••••••">
+</label>
+</div>
+</fieldset>
+<div class="settings-grid">
+<fieldset>
+<legend data-i18n="generation">
+</legend>
+<label>
+<span data-i18n="provider">
+</span>
+<select name="generation_provider">
+<option value="openai">OpenAI-compatible</option>
+<option value="openrouter">OpenRouter</option>
+</select>
+</label>
+<label>
+<span data-i18n="model">
+</span>
+<input name="generation_model" required maxlength="200">
+</label>
+<label>
+<span data-i18n="temperature">
+</span>
+<input name="generation_temperature" type="number" min="0" max="2" step="0.1" required>
+</label>
+<label>
+<span data-i18n="maxTokens">
+</span>
+<input name="generation_max_tokens" type="number" min="128" max="8192" required>
+</label>
+</fieldset>
+<fieldset>
+<legend data-i18n="evaluation">
+</legend>
+<label>
+<span data-i18n="provider">
+</span>
+<select name="evaluation_provider">
+<option value="openai">OpenAI-compatible</option>
+<option value="openrouter">OpenRouter</option>
+</select>
+</label>
+<label>
+<span data-i18n="model">
+</span>
+<input name="evaluation_model" required maxlength="200">
+</label>
+<label>
+<span data-i18n="temperature">
+</span>
+<input name="evaluation_temperature" type="number" min="0" max="2" step="0.1" required>
+</label>
+<label>
+<span data-i18n="maxTokens">
+</span>
+<input name="evaluation_max_tokens" type="number" min="128" max="8192" required>
+</label>
+</fieldset>
+</div>
+<p data-i18n="serverConfig">
+</p>
+<dl id="provider-status">
+</dl>
+<fieldset class="mcp-settings">
+<legend data-i18n="studyConnections">
+</legend>
+<label class="checkbox">
+<input type="checkbox" name="mcp_enabled">
+<span data-i18n="enableMcp">
+</span>
+</label>
+<p data-i18n="mcpNote">
+</p>
+<button type="button" id="sync" data-i18n="sync">
+</button>
+<p id="sync-status" role="status">
+</p>
+<div id="sync-items">
+</div>
+</fieldset>
+<div class="answer-actions">
+<button class="primary" data-i18n="save">
+</button>
+<button type="button" id="logout" data-i18n="logout">
+</button>
+</div>
+</form>
+</section>
+<footer data-i18n="footer">
+</footer>
+</main>
+</body>
+</html>

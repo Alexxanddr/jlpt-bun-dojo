@@ -27,6 +27,8 @@ OpenRouter, and optional Bunpro and WaniKani MCP integrations.
 
 ## Screenshots
 
+The English screenshots below use synthetic examples, not personal study history.
+
 ![English writing exercise](docs/screenshots/practice.jpg)
 
 ![Progress dashboard and data attribution](docs/screenshots/progress.jpg)
@@ -261,3 +263,20 @@ See [Known issues and limits](docs/KNOWN_ISSUES.md) for the expanded list.
 
 JLPT Bun Dojo is released under the [MIT License](LICENSE). Bundled language data
 retains its original attribution and licensing terms.
+
+### Browser regression checks
+
+The UI tests use isolated Chromium with synthetic API responses; no credentials or
+provider quota are needed. Backend tests separately exercise the real FastAPI/SQLite flows.
+
+```bash
+npm ci
+npx playwright install chromium
+make check-ui
+```
+
+Use `PLAYWRIGHT_CHANNEL=chrome make check-ui` to use an installed Chrome instead.
+Screenshots are saved under ignored `test-results/`. CI runs the browser checks too.
+
+The [interface and reliability review](docs/UI_REVIEW.md) records the design direction,
+covered workflows, sample data and limits of the automated checks.

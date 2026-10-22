@@ -4,36 +4,62 @@ const $ = (id) => document.getElementById(id);
 let ui = localStorage.getItem('ui_language') || 'it';
 if (!['it', 'en'].includes(ui)) ui = 'it';
 let messages = {}, grammar = [], config, current, hinted = false, view = 'practice';
-let newGeneration = false;
+let newGeneration = false, pending = false, lastResult = null;
 const t = (key) => messages[key] || key;
 const text = (tag, value, cls) => { const e = document.createElement(tag); e.textContent = value; if (cls) e.className = cls; return e; };
 const date = (v) => new Date(v * 1000).toLocaleString(ui);
-function notice(key) { $('notice').textContent = t(key); }
+function notice(key, kind = 'info') {
+  $('notice').textContent = t(key);
+  $('notice').dataset.kind = kind;
+}
 async function api(path, body, method = 'POST') {
-  const response = await fetch('/api/' + path, {method: body === undefined ? 'GET' : method,
-    headers: {'Content-Type':'application/json', 'X-Trainer-Request':'1'},
-    body: body === undefined ? undefined : JSON.stringify(body)});
-  const data = await response.json();
-  if (!response.ok) { if (response.status === 401) showLogin(); throw new Error(typeof data.detail === 'string' ? data.detail : 'invalid_input'); }
+  let response;
+  try {
+    response = await fetch('/api/' + path, {method: body === undefined ? 'GET' : method,
+      headers: {'Content-Type':'application/json', 'X-Trainer-Request':'1'},
+      body: body === undefined ? undefined : JSON.stringify(body)});
+  } catch { throw new Error('connection_failed'); }
+  if (response.status === 401) {
+    showLogin();
+    throw new Error(path === 'login' ? 'invalid_credentials' : 'authentication_required');
+  }
+  let data;
+  try { data = await response.json(); } catch { throw new Error('server_unavailable'); }
+  if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'invalid_input');
   return data;
 }
 async function busy(button, fn) {
-  button.disabled = true; notice('working');
-  try { await fn(); $('notice').textContent = ''; } catch (error) { notice(error.message); }
-  finally { button.disabled = false; }
-}
-async function busyForm(form, fn) {
-  const controls = [...form.elements];
+  if (pending) return false;
+  pending = true;
+  const controls = [...document.querySelectorAll('button, input, select, textarea')];
+  const disabled = controls.map(control => control.disabled);
   controls.forEach(control => { control.disabled = true; });
+  document.querySelector('main').setAttribute('aria-busy', 'true');
   notice('working');
-  try { await fn(); $('notice').textContent = ''; } catch (error) { notice(error.message); }
-  finally { controls.forEach(control => { control.disabled = false; }); syncExerciseOptions(); }
+  try {
+    const message = await fn();
+    notice(message || '', 'success');
+    return true;
+  } catch (error) {
+    notice(messages[error.message] ? error.message : 'server_unavailable', 'error');
+    return false;
+  } finally {
+    pending = false;
+    controls.forEach((control, index) => { control.disabled = disabled[index]; });
+    document.querySelector('main').setAttribute('aria-busy', 'false');
+    syncExerciseOptions();
+  }
 }
 function syncExerciseOptions() {
+  if (pending) return;
   const state = exerciseOptions($('mode').value, newGeneration);
   $('generate').checked = state.generate;
   $('generate').disabled = state.generateDisabled;
   $('difficulty').disabled = state.difficultyDisabled;
+  $('grade').disabled = !current || !!lastResult;
+  $('answer').readOnly = !!lastResult;
+  $('hint').disabled = !current || hinted || !!lastResult;
+  $('mode-help').textContent = t('modeHelp_' + $('mode').value);
 }
 async function translate(lang) {
   ui = lang; messages = await (await fetch(`/static/locales/${ui}.json`)).json();
@@ -41,13 +67,14 @@ async function translate(lang) {
   document.querySelectorAll('[data-i18n]').forEach(e => { e.textContent = t(e.dataset.i18n); });
   categories();
   if (current) displayExercise();
+  if (lastResult) renderResult(lastResult);
 }
 function categories() {
   for (const id of ['category','settings-category']) {
     const select = $(id), old = select.value;
     select.replaceChildren(new Option(t('allCategories'), ''));
     [...new Set(grammar.map(g => g.category))].forEach(c => select.add(new Option(t(c), c)));
-    select.value = old;
+    select.value = [...select.options].some(option => option.value === old) ? old : '';
   }
 }
 function showLogin() {
@@ -55,9 +82,11 @@ function showLogin() {
   for (const id of ['practice','history','journal','stats','settings']) $(id).hidden = true;
   $('login').hidden = false;
 }
-async function bootstrap() {
+async function bootstrap(next = 'practice') {
   const data = await api('settings'); config = data.settings;
   grammar = await api('grammar'); categories();
+  await translate(config.ui_language);
+  $('settings-form').reset();
   $('source-language').value = config.language; $('category').value = config.category;
   for (const [key, value] of Object.entries(config)) {
     const el = $('settings-form').elements.namedItem(key);
@@ -69,7 +98,8 @@ async function bootstrap() {
   }
   document.querySelectorAll('[data-view]').forEach(e => { e.hidden = data.demo_mode && e.dataset.view !== 'practice'; });
   $('logout').hidden = !data.authentication_enabled;
-  $('login').hidden = true; $('nav').hidden = false; await showView('practice');
+  $('login').hidden = true; $('nav').hidden = false; await showView(next);
+  syncExerciseOptions();
 }
 async function showView(next) {
   view = next;
@@ -83,7 +113,7 @@ function displayExercise() {
   $('exercise').hidden = false; $('exercise-empty').hidden = true;
   $('prompt').textContent = current.prompt; $('prompt').lang = current.language;
   $('grammar-label').textContent = current.grammar[`title_${ui}`];
-  $('difficulty-label').textContent = t(current.difficulty);
+  $('difficulty-label').textContent = current.attribution.startsWith('AI-generated') ? t(current.difficulty) : t('reviewedSentence');
   $('grammar-description').textContent = current.grammar[`description_${ui}`];
   let attribution = current.attribution;
   try {
@@ -105,11 +135,11 @@ function renderWeaknesses(target, values) {
     if (typeof target !== 'string') continue;
     const row = text('p', `${w.source}: ${target}${meanings}${accuracy}`);
     const slug = evidence.slug || evidence.target;
-    if (typeof slug === 'string' && slug.length <= 200) {
+    if (w.source === 'wanikani' && typeof slug === 'string' && slug.length <= 200) {
       const link = text('a', t('openStudyPoint'));
       const kind = evidence.subject_type || evidence.kind;
       const type = ['kanji','vocabulary','radical'].includes(kind) ? kind : 'vocabulary';
-      link.href = w.source === 'bunpro' ? 'https://bunpro.jp/grammar_points/' + encodeURIComponent(slug) : 'https://www.wanikani.com/' + type + '/' + encodeURIComponent(slug);
+      link.href = 'https://www.wanikani.com/' + type + '/' + encodeURIComponent(slug);
       link.rel = 'noreferrer'; link.target = '_blank'; row.append(' ',link);
     }
     details.append(row);
@@ -117,7 +147,9 @@ function renderWeaknesses(target, values) {
   target.append(details);
 }
 function renderResult(result) {
+  lastResult = result;
   $('feedback').hidden = false;
+  $('feedback').dataset.accepted = String(result.accepted);
   $('verdict').textContent = t(result.accepted ? 'accepted' : 'tryAgain');
   $('scores').replaceChildren();
   for (const [axis, score] of Object.entries(result.ai.scores)) {
@@ -131,7 +163,9 @@ function renderResult(result) {
   $('explanation').textContent = result.ai.explanation;
   $('suggestions').replaceChildren(...result.ai.suggestions.map(v => text('li',v)));
   $('corrections').replaceChildren(...result.ai.corrections.map(v => text('p',v)));
+  $('corrections-section').hidden = !result.ai.corrections.length;
   $('variants').replaceChildren(...result.ai.valid_variants.map(v => text('p',v)));
+  $('variants-section').hidden = !result.ai.valid_variants.length;
   $('next-review').textContent = result.next_review ? `${t('nextReview')}: ${date(result.next_review)}` : t('cramNoSchedule');
 }
 async function history() {
@@ -169,7 +203,7 @@ function radar(axes) {
     p.setAttribute('fill','none'); p.setAttribute('stroke','#c9d6e8'); svg.append(p);
   }
   const p = document.createElementNS(ns,'polygon'); p.setAttribute('points',keys.map((k,i)=>pt(i,axes[k]*1.2).join(',')).join(' '));
-  p.setAttribute('fill','#244e9133'); p.setAttribute('stroke','#244e91'); p.setAttribute('stroke-width','2'); svg.append(p);
+  p.setAttribute('fill','#14665f22'); p.setAttribute('stroke','#14665f'); p.setAttribute('stroke-width','2'); svg.append(p);
   keys.forEach((key,i)=>{ const label = document.createElementNS(ns,'text'), [x,y]=pt(i,148); label.setAttribute('x',x); label.setAttribute('y',y); label.setAttribute('text-anchor','middle'); label.setAttribute('font-size','12'); label.setAttribute('fill','#182d50'); label.textContent=t(key); svg.append(label); });
   $('radar').replaceChildren(svg);
 }
@@ -186,27 +220,74 @@ async function stats() {
   $('sources').replaceChildren(text('p',t('starterData')));
   data.sources.forEach(s => {const m=JSON.parse(s.data); $('sources').append(text('p',`${s.name}: ${m.entries} ${t('entries')}; ${m.license}; ${date(s.imported_at)}`));});
   renderWeaknesses($('stats-weaknesses'),data.weaknesses.items);
+  if (!data.weaknesses.items.length) $('stats-weaknesses').append(text('p',t('noWeaknesses')));
 }
-$('ui-language').onchange = async e => { await translate(e.target.value); if (config) await showView(view); };
-$('login-form').onsubmit = e => {e.preventDefault(); busy(e.submitter,async()=>{await api('login',{password:$('password').value}); $('password').value=''; await bootstrap();});};
+$('ui-language').onchange = e => {
+  const language = e.target.value;
+  busy(e.target, async () => {
+    await translate(language);
+    if (config) { $('settings-form').elements.ui_language.value = language; await showView(view); }
+  });
+};
+$('login-form').onsubmit = e => {e.preventDefault(); busy(e.submitter,async()=>{
+  await api('login',{password:$('password').value}); $('password').value=''; await bootstrap();
+});};
 document.querySelectorAll('[data-view]').forEach(e=> e.onclick=()=>busy(e,()=>showView(e.dataset.view)));
 $('exercise-form').onsubmit = e => {e.preventDefault();
   const request={language:$('source-language').value,category:$('category').value,mode:$('mode').value,generate:$('generate').checked,difficulty:$('difficulty').value};
-  busyForm(e.currentTarget,async()=>{
-  current=await api('exercises',request);
-  hinted=false; $('answer').value=''; $('hint-text').textContent=''; $('char-count').textContent='0 / 500'; $('feedback').hidden=true; $('grade').disabled=false; displayExercise(); $('answer').focus();
-});};
+  busy(e.submitter,async()=>{
+    const exercise = await api('exercises',request);
+    current=exercise; lastResult=null; hinted=false;
+    $('answer').value=''; $('hint-text').textContent=''; $('char-count').textContent='0 / 500';
+    $('feedback').hidden=true; displayExercise();
+  }).then(ok=>{if(ok) $('answer').focus();});
+};
 $('answer').oninput=()=>{$('char-count').textContent=`${$('answer').value.length} / 500`;};
-$('answer-form').onsubmit=e=>{e.preventDefault(); busy(e.submitter,async()=>{const r=await api('answers',{exercise_id:current.id,answer:$('answer').value,hinted}); renderResult(r);}).then(()=>{ if (!$('feedback').hidden) $('grade').disabled=true; });};
-$('hint').onclick=()=>busy($('hint'),async()=>{const r=await api(`exercises/${current.id}/hint`); hinted=true; $('hint-text').textContent=r.references.join(' / ');});
-$('settings-form').onsubmit=e=>{e.preventDefault(); busy(e.submitter,async()=>{
-  const data=Object.fromEntries(new FormData(e.target)); data.mcp_enabled=e.target.elements.mcp_enabled.checked;
-  await api('settings',data,'PUT'); await translate(data.ui_language); await bootstrap(); await showView('settings');
-});};
-$('sync').onclick=()=>busy($('sync'),async()=>{const r=await api('mcp/sync',{}); if(r.unavailable.length) throw new Error('mcp_unavailable'); if(!r.items.length) throw new Error('noWeaknesses');});
-$('logout').onclick=()=>busy($('logout'),async()=>{await api('logout',{}); config=null; showLogin();});
+$('answer-form').onsubmit=e=>{e.preventDefault();
+  if (!current || lastResult || !$('answer').value.trim()) return;
+  const request={exercise_id:current.id,answer:$('answer').value,hinted};
+  busy(e.submitter,async()=>{renderResult(await api('answers',request));});
+};
+$('hint').onclick=()=>busy($('hint'),async()=>{
+  const r=await api(`exercises/${current.id}/hint`); hinted=true; $('hint-text').textContent=r.references.join(' / ');
+});
+function settingsData() {
+  const form = $('settings-form'), data = Object.fromEntries(new FormData(form));
+  data.mcp_enabled = form.elements.mcp_enabled.checked;
+  return data;
+}
+async function saveSettings(data) {
+  await api('settings',data,'PUT');
+  await bootstrap('settings');
+}
+$('settings-form').onsubmit=e=>{e.preventDefault();
+  const data=settingsData();
+  busy(e.submitter,async()=>{await saveSettings(data); return 'settingsSaved';});
+};
+$('sync').onclick=()=>{
+  if (!$('settings-form').reportValidity()) return;
+  const data=settingsData();
+  busy($('sync'),async()=>{
+    await saveSettings(data);
+    const r=await api('mcp/sync',{});
+    $('sync-status').textContent = `${t('syncedItems')}: ${r.items.length}` +
+      (r.unavailable.length ? ` — ${t('unavailableSources')}: ${r.unavailable.join(', ')}` : '');
+    renderWeaknesses($('sync-items'), r.items);
+    if (!r.items.length) throw new Error(r.unavailable.length ? 'mcp_unavailable' : 'noWeaknesses');
+    return r.unavailable.length ? 'syncPartial' : 'syncComplete';
+  });
+};
+$('logout').onclick=()=>busy($('logout'),async()=>{
+  await api('logout',{}); config=null; current=null; lastResult=null; hinted=false;
+  $('answer').value=''; $('feedback').hidden=true; $('exercise').hidden=true; $('exercise-empty').hidden=false;
+  $('settings-form').reset(); $('sync-items').replaceChildren(); $('sync-status').textContent=''; showLogin();
+});
 $('generate').onchange=()=>{newGeneration=$('generate').checked; syncExerciseOptions();};
 $('mode').onchange=syncExerciseOptions;
-syncExerciseOptions();
+const compactLayout = matchMedia('(max-width: 850px)');
+const foldOptions = () => { $('session-options').open = !compactLayout.matches; };
+compactLayout.addEventListener('change', foldOptions);
+foldOptions();
 await translate(ui);
-try {await bootstrap();} catch(error) {if(error.message!=='authentication_required') notice(error.message);}
+syncExerciseOptions();
+await busy(null, bootstrap);

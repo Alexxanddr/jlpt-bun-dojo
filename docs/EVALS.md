@@ -36,3 +36,12 @@ A rewrite passes the behavioral baseline when all derived golden cases, the exis
 test suite's equivalent contracts, migrations/seed counts, security boundary tests,
 and both locale-key sets pass. Live model scores may vary; compare constraint pass rate
 and human judgments, not byte-for-byte text.
+
+## Browser regression checks
+
+`npm ci`, `npx playwright install chromium`, then `make check-ui` exercise the real
+frontend with controlled API responses. Coverage includes delayed/error responses,
+mode transitions, settings and partial MCP sync, login/session/logout, bilingual
+feedback and responsive layouts. Use `PLAYWRIGHT_CHANNEL=chrome make check-ui` to
+run against installed Chrome. These tests complement API tests; they do not replace
+live integration checks or human review of model output.

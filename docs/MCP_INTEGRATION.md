@@ -38,9 +38,10 @@ HTML, external links, unknown fields, and over-size detail responses are discard
    then at most ten total.
 6. Compact each accepted item to source, target, kind, meanings, and accuracy before UI
    or model use.
-7. Generated Japanese must contain at least one selected target, matched against text
+7. Every generated Japanese reference must contain at least one selected lexical target, matched against text
    or Sudachi surface/lemma/normalized forms, and every reference must pass local scope
-   checks. Corrective retry receives only validation facts.
+   checks. Grammar labels guide the model but are not searched literally: constructions
+   need contextual judgment. Corrective retry receives only validation facts.
 
 ## Trust and failures
 

@@ -201,3 +201,34 @@ def test_generation_retries_until_targeted_weakness_is_used():
     assert result.references == ["学生を見ます。"]
     assert calls[0]["difficulty"] == "challenging"
     assert calls[1]["validation_issues"] == [{"code": "generated_without_weakness", "targets": ["学生"]}]
+
+
+def test_every_reference_must_include_a_lexical_weakness():
+    def handle(request):
+        return httpx.Response(200, json={"choices": [{"finish_reason": "stop", "message": {
+            "content": Generated(prompt="Vedo uno studente.", references=["学生を見ます。", "本を見ます。"])
+            .model_dump_json()}}]})
+    with pytest.raises(AIError, match="^generated_without_weakness$"):
+        asyncio.run(AIClient(Settings(), httpx.MockTransport(handle)).generate(
+            "it", {"pattern": "N を V"}, [{"target": "学生", "kind": "vocabulary"}],
+            allowed_kanji="学生本見", allowed_vocabulary=["学生", "本", "見る"]))
+
+
+def test_grammar_labels_are_not_literal_words_required_in_references():
+    transport = httpx.MockTransport(lambda request: httpx.Response(200, json={"choices": [
+        {"finish_reason": "stop", "message": {"content": Generated(
+            prompt="Sono uno studente.", references=["学生です。"]).model_dump_json()}}]}))
+    result = asyncio.run(AIClient(Settings(), transport).generate(
+        "it", {"pattern": "N です"}, [{"target": "だ・です", "kind": "grammar"}],
+        allowed_kanji="学生", allowed_vocabulary=["学生"]))
+    assert result.references == ["学生です。"]
+
+
+def test_truncated_response_reports_token_limit_without_identical_retry():
+    calls = []
+    def handle(request):
+        calls.append(request)
+        return httpx.Response(200, json={"choices": [{"finish_reason": "length", "message": {"content": "{"}}]})
+    with pytest.raises(AIError, match="^provider_incomplete$"):
+        asyncio.run(AIClient(Settings(), httpx.MockTransport(handle)).evaluate("it", "Sono uno studente.", "学生です。", {}, {}))
+    assert len(calls) == 1

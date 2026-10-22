@@ -4,6 +4,17 @@ All notable changes to JLPT Bun Dojo are documented here.
 
 ## Unreleased
 
+- Redesign the study workspace with separate practice options, a focused writing sheet,
+  responsive navigation, clearer feedback and bilingual success/error states.
+- Serialize browser operations to prevent mixed exercises, hints and evaluation results;
+  preserve drafts on failed requests and make completed answers read-only.
+- Save settings before MCP sync, clear key inputs after saving, and show usable partial results.
+- Preserve sentence identity and review scheduling when translating a review prompt.
+- Count hints requested while evaluation is running; apply lexical weakness checks to
+  every reference without treating grammar labels as literal vocabulary.
+- Report model output limits separately and add corrective instructions for schema retries.
+- Add browser regression tests to CI alongside the API, provider and data checks.
+
 - Publish a dedicated MCP container image and use it in Kubernetes so the Bunpro and
   WaniKani server executables are available at runtime.
 

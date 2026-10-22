@@ -1,4 +1,4 @@
-.PHONY: dev check seed update-data
+.PHONY: dev check check-ui seed update-data
 
 dev:
 	uv run uvicorn trainer.app:app --host 127.0.0.1 --env-file .env --no-access-log
@@ -10,3 +10,6 @@ seed:
 	uv run sh scripts/seed
 update-data:
 	uv run python -m trainer.import_data "$(or $(MANIFEST),trainer/data/manifest.json)"
+
+check-ui:
+	npm test

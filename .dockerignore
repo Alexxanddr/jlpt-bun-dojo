@@ -9,3 +9,7 @@ __pycache__
 .mypy_cache
 .ruff_cache
 strix_runs
+
+node_modules
+test-results
+.taste-skill

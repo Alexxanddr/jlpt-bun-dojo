@@ -16,7 +16,10 @@ require strict `response_format: json_schema` support.
 Requests have a 60-second timeout, do not follow redirects, and accept at most 256 KiB.
 Only `finish_reason=stop` and a Pydantic-valid schema response succeed. HTTP 429 maps to
 `provider_rate_limited`; other HTTP/transport failures and malformed envelopes are
-redacted to stable codes. There is no provider or free-text fallback.
+redacted to stable codes. Malformed/schema-invalid output gets one corrective retry.
+Output-limit truncation returns `provider_incomplete` immediately so the learner can
+raise the token budget. HTTP errors and timeouts are not retried. There is no provider
+or free-text fallback.
 
 ## Settings precedence
 
@@ -29,7 +32,7 @@ configured status reaches the browser.
 
 Generation creates a prompt plus one to three Japanese references and may run two
 attempts, or three for targeted/challenging work. Evaluation grades an existing learner
-answer once. See [PROMPTS.md](PROMPTS.md) and [GRADING.md](GRADING.md).
+answer with at most two structured attempts. See [PROMPTS.md](PROMPTS.md) and [GRADING.md](GRADING.md).
 
 ## Operational characteristics
 
@@ -45,4 +48,4 @@ does not contain a general cost benchmark.
 
 - No minimum model size, context length, or supported-model matrix is documented.
 - No retry/backoff policy exists for provider HTTP errors; corrective retries apply
-  only after structurally valid generation output fails local validation.
+  to schema-invalid output and to structurally valid generation output that fails local validation.

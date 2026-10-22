@@ -13,7 +13,8 @@ Bunpro and WaniKani MCP integrations are optional; the browser is dependency-fre
 uv sync --frozen                         # install locked Python and development dependencies
 make dev                                 # http://127.0.0.1:8000, reading .env
 make check                               # Ruff, mypy, pytest
-node --test tests/exercise-options.test.mjs
+npm ci && npx playwright install chromium
+make check-ui
 uv run pip-audit
 docker build -t jlpt-bun-dojo:local .
 docker run --rm -p 127.0.0.1:8000:8000 --env-file .env jlpt-bun-dojo:local

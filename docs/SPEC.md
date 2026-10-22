@@ -43,6 +43,10 @@ It is practice software, not an official certification or a complete N5 syllabus
   final failure saves no generated exercise.
 - A deterministic error can reject an answer the model accepted. Scope observations cannot.
 - Revealing a hint caps scheduling quality at 2, even if the client omits that fact later.
+- Translating a review prompt preserves its original sentence and schedule.
+- Browser operations are serialized; failed requests preserve the current draft and
+  completed answers stay read-only until the next exercise.
+- MCP synchronization saves edited settings first and reports partial source failures.
 - Failed provider evaluation saves no attempt. A completed answer is idempotent.
 - Password authentication is optional. Public demo mode exposes practice while blocking
   settings mutation, MCP sync, history, journal, and aggregate statistics.

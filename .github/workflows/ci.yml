@@ -15,5 +15,11 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy trainer
       - run: uv run pytest
-      - run: node --test tests/exercise-options.test.mjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
       - run: uv run pip-audit
