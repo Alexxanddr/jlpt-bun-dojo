@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n5-trainer
+data:
+  APP_ORIGIN: http://localhost:8000
+  COOKIE_SECURE: 'false'
+  DATABASE_PATH: /data/trainer.sqlite3
+  OPENAI_BASE_URL: http://lm-studio:1234/v1
+  GENERATION_PROVIDER: openai
+  EVALUATION_PROVIDER: openai
+  GENERATION_MODEL: local-model
+  EVALUATION_MODEL: local-model

@@ -1,0 +1,25 @@
+{
+  "retrieved": "2026-10-21",
+  "inputs": [
+    {
+      "file": "n5-tanos.csv",
+      "url": "https://raw.githubusercontent.com/elzup/jlpt-word-list/13aa3c54b27115be72d8a62cd4071077c68d2171/src/n5.csv",
+      "sha256": "8863a96442adeadfa3510edb84bd60b158ed6b3839172b93cab2ceb026e5ef8a"
+    },
+    {
+      "file": "jmdict.zip",
+      "url": "https://github.com/scriptin/jmdict-simplified/releases/download/3.6.2%2B20261019180022/jmdict-eng-common-3.6.2%2B20261019180022.json.zip",
+      "sha256": "d9a43b326561f9d88d7b1acc4cab5ea2b834d3634f119548c427ab2f772d7841"
+    },
+    {
+      "file": "kanjidic.zip",
+      "url": "https://github.com/scriptin/jmdict-simplified/releases/download/3.6.2%2B20261019180022/kanjidic2-en-3.6.2%2B20261019180022.json.zip",
+      "sha256": "74704f1a8701eddb2a018a0c361c881dcd62ac7ff09750d5155c7981ee4dc99d"
+    },
+    {
+      "file": "tatoeba-books.json",
+      "url": "https://api.tatoeba.org/unstable/sentences?lang=jpn&sort=words&limit=10&q=%E6%9C%AC&trans%3Alang=ita&trans%3Ais_direct=yes&showtrans%3Alang=ita,eng&showtrans%3Ais_direct=yes",
+      "sha256": "4e1026f8a07716b52753378db02bf53f3b1cc2f2e22f30aca6cf2515a48c44cc"
+    }
+  ]
+}

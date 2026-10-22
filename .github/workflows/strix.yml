@@ -1,0 +1,30 @@
+# Explicit opt-in: consumes the configured provider quota; never receives secrets on fork PRs.
+name: Strix security review
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  strix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Install Strix
+        run: curl --fail --silent --show-error --location https://strix.ai/install -o /tmp/install-strix.sh && bash /tmp/install-strix.sh
+      - name: Scan
+        env:
+          STRIX_LLM: ${{ secrets.STRIX_LLM }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+        run: strix -n -t ./ --scan-mode quick --max-budget 10
+      - name: Require completed scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_json=$(ls -t strix_runs/*/run.json | head -1)
+          test "$(jq -r .status "$run_json")" = completed
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: strix-report
+          path: strix_runs/

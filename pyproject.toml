@@ -1,0 +1,30 @@
+[project]
+name = "it-ja-n5-trainer"
+version = "0.1.0"
+description = "Self-hosted Italian/English to Japanese N5 writing practice"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "fastapi>=0.119,<1",
+  "uvicorn>=0.37,<1",
+  "httpx>=0.28,<1",
+  "pydantic>=2.12,<3",
+  "sudachipy>=0.6.10,<0.7",
+  "sudachidict-core>=20250515",
+  "mcp>=1.18,<2",
+  "ijson>=3.4,<4",
+  "lingua-language-detector>=2.1,<3",
+]
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.14,<1", "mypy>=1.18,<2", "pip-audit>=2.9,<3"]
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+ignore_missing_imports = true
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

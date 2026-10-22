@@ -1,0 +1,10 @@
+# docker compose -f docker-compose.yml -f docker-compose.mcp.yml up --build -d
+services:
+  trainer:
+    build:
+      target: mcp
+    environment:
+      BUNPRO_MCP_COMMAND: /usr/local/bin/bunpro-mcp-server
+      BUNPRO_MCP_ARGS: '[]'
+      WANIKANI_MCP_COMMAND: /usr/local/bin/kani-mcp-server
+      WANIKANI_MCP_ARGS: '[]'

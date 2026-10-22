@@ -1,0 +1,730 @@
+{
+  "grammar": [
+    {
+      "id": "copula",
+      "category": "basics",
+      "title_it": "Essere: です",
+      "title_en": "Being: です",
+      "description_it": "Usa です per identificarti.",
+      "description_en": "Use です to identify yourself.",
+      "pattern": "N は N です"
+    },
+    {
+      "id": "negative",
+      "category": "basics",
+      "title_it": "Negazione nominale",
+      "title_en": "Negative copula",
+      "description_it": "じゃありません nega un nome.",
+      "description_en": "じゃありません negates a noun.",
+      "pattern": "N は N じゃありません"
+    },
+    {
+      "id": "question",
+      "category": "basics",
+      "title_it": "Domande con か",
+      "title_en": "Questions with か",
+      "description_it": "か conclude una domanda cortese.",
+      "description_en": "か ends a polite question.",
+      "pattern": "N は N ですか"
+    },
+    {
+      "id": "possession",
+      "category": "particles",
+      "title_it": "Possesso con の",
+      "title_en": "Possession with の",
+      "description_it": "の collega il possessore al nome.",
+      "description_en": "の connects a possessor to a noun.",
+      "pattern": "N の N"
+    },
+    {
+      "id": "object",
+      "category": "particles",
+      "title_it": "Oggetto con を",
+      "title_en": "Object with を",
+      "description_it": "を indica l’oggetto diretto.",
+      "description_en": "を marks the direct object.",
+      "pattern": "N を Vます"
+    },
+    {
+      "id": "destination",
+      "category": "particles",
+      "title_it": "Destinazione con に",
+      "title_en": "Destination with に",
+      "description_it": "に indica la destinazione con 行く.",
+      "description_en": "に marks the destination with 行く.",
+      "pattern": "N に 行きます"
+    },
+    {
+      "id": "location",
+      "category": "particles",
+      "title_it": "Luogo di un’azione con で",
+      "title_en": "Action location with で",
+      "description_it": "で indica dove avviene un’azione.",
+      "description_en": "で marks where an action happens.",
+      "pattern": "N で Vます"
+    },
+    {
+      "id": "time",
+      "category": "particles",
+      "title_it": "Orario con に",
+      "title_en": "Time with に",
+      "description_it": "に segue un orario preciso.",
+      "description_en": "に follows a specific time.",
+      "pattern": "時 に Vます"
+    },
+    {
+      "id": "also",
+      "category": "particles",
+      "title_it": "Anche con も",
+      "title_en": "Also with も",
+      "description_it": "も aggiunge un elemento simile.",
+      "description_en": "も adds a similar item.",
+      "pattern": "N も N です"
+    },
+    {
+      "id": "past",
+      "category": "verbs",
+      "title_it": "Passato cortese",
+      "title_en": "Polite past",
+      "description_it": "ました esprime un’azione passata.",
+      "description_en": "ました expresses a past action.",
+      "pattern": "Vました"
+    },
+    {
+      "id": "verb-negative",
+      "category": "verbs",
+      "title_it": "Negazione cortese",
+      "title_en": "Polite negative",
+      "description_it": "ません nega un’azione.",
+      "description_en": "ません negates an action.",
+      "pattern": "Vません"
+    },
+    {
+      "id": "past-negative",
+      "category": "verbs",
+      "title_it": "Passato negativo",
+      "title_en": "Negative past",
+      "description_it": "ませんでした nega un’azione passata.",
+      "description_en": "ませんでした negates a past action.",
+      "pattern": "Vませんでした"
+    },
+    {
+      "id": "request",
+      "category": "verbs",
+      "title_it": "Richieste con ください",
+      "title_en": "Requests with ください",
+      "description_it": "Usa la forma て con ください.",
+      "description_en": "Use the て form with ください.",
+      "pattern": "Vて ください"
+    },
+    {
+      "id": "progressive",
+      "category": "verbs",
+      "title_it": "Azioni in corso",
+      "title_en": "Actions in progress",
+      "description_it": "ている descrive un’azione in corso.",
+      "description_en": "ている describes an ongoing action.",
+      "pattern": "Vて います"
+    },
+    {
+      "id": "invitation",
+      "category": "verbs",
+      "title_it": "Inviti con ませんか",
+      "title_en": "Invitations with ませんか",
+      "description_it": "ませんか propone un’attività.",
+      "description_en": "ませんか proposes an activity.",
+      "pattern": "Vませんか"
+    },
+    {
+      "id": "desire",
+      "category": "verbs",
+      "title_it": "Desideri con たい",
+      "title_en": "Wishes with たい",
+      "description_it": "たい esprime ciò che desideri fare.",
+      "description_en": "たい expresses what you want to do.",
+      "pattern": "Vたいです"
+    },
+    {
+      "id": "existence",
+      "category": "existence",
+      "title_it": "Esistenza con あります",
+      "title_en": "Existence with あります",
+      "description_it": "あります si usa per cose inanimate.",
+      "description_en": "あります is used for inanimate things.",
+      "pattern": "N に N が あります"
+    },
+    {
+      "id": "animate",
+      "category": "existence",
+      "title_it": "Esistenza con います",
+      "title_en": "Existence with います",
+      "description_it": "います si usa per persone e animali.",
+      "description_en": "います is used for people and animals.",
+      "pattern": "N に N が います"
+    },
+    {
+      "id": "i-adjective",
+      "category": "adjectives",
+      "title_it": "Aggettivi in い",
+      "title_en": "い adjectives",
+      "description_it": "Un aggettivo in い descrive un nome o conclude una frase.",
+      "description_en": "An い adjective describes a noun or ends a sentence.",
+      "pattern": "い adjective + N / N は い adjective"
+    },
+    {
+      "id": "na-adjective",
+      "category": "adjectives",
+      "title_it": "Aggettivi in な",
+      "title_en": "な adjectives",
+      "description_it": "Usa な prima di un nome.",
+      "description_en": "Use な before a noun.",
+      "pattern": "な adjective + N"
+    },
+    {
+      "id": "adjective-negative",
+      "category": "adjectives",
+      "title_it": "Negazione degli aggettivi in い",
+      "title_en": "Negative い adjectives",
+      "description_it": "くない nega un aggettivo in い.",
+      "description_en": "くない negates an い adjective.",
+      "pattern": "い → くないです"
+    },
+    {
+      "id": "because",
+      "category": "connections",
+      "title_it": "Motivo con から",
+      "title_en": "Reason with から",
+      "description_it": "から introduce il motivo.",
+      "description_en": "から gives the reason.",
+      "pattern": "S から S"
+    },
+    {
+      "id": "like",
+      "category": "adjectives",
+      "title_it": "Preferenze con 好き",
+      "title_en": "Preferences with 好き",
+      "description_it": "好き usa が per ciò che piace.",
+      "description_en": "好き uses が for what you like.",
+      "pattern": "N が 好きです"
+    },
+    {
+      "id": "from-to",
+      "category": "particles",
+      "title_it": "Da… a…",
+      "title_en": "From… to…",
+      "description_it": "から e まで indicano gli estremi.",
+      "description_en": "から and まで mark endpoints.",
+      "pattern": "N から N まで"
+    }
+  ],
+  "sentences": [
+    {
+      "id": "seed-copula",
+      "grammar_id": "copula",
+      "it": "Sono uno studente.",
+      "en": "I am a student.",
+      "refs": [
+        "私は学生です。"
+      ]
+    },
+    {
+      "id": "seed-negative",
+      "grammar_id": "negative",
+      "it": "Non sono un insegnante.",
+      "en": "I am not a teacher.",
+      "refs": [
+        "私は先生じゃありません。"
+      ]
+    },
+    {
+      "id": "seed-question",
+      "grammar_id": "question",
+      "it": "Sei uno studente?",
+      "en": "Are you a student?",
+      "refs": [
+        "学生ですか。"
+      ]
+    },
+    {
+      "id": "seed-possession",
+      "grammar_id": "possession",
+      "it": "Questo è il mio libro.",
+      "en": "This is my book.",
+      "refs": [
+        "これは私の本です。"
+      ]
+    },
+    {
+      "id": "seed-object",
+      "grammar_id": "object",
+      "it": "Mangio una mela.",
+      "en": "I eat an apple.",
+      "refs": [
+        "りんごを食べます。"
+      ]
+    },
+    {
+      "id": "seed-destination",
+      "grammar_id": "destination",
+      "it": "Vado a scuola.",
+      "en": "I go to school.",
+      "refs": [
+        "学校に行きます。"
+      ]
+    },
+    {
+      "id": "seed-location",
+      "grammar_id": "location",
+      "it": "Leggo un libro a casa.",
+      "en": "I read a book at home.",
+      "refs": [
+        "家で本を読みます。"
+      ]
+    },
+    {
+      "id": "seed-time",
+      "grammar_id": "time",
+      "it": "Mi alzo alle sette.",
+      "en": "I get up at seven.",
+      "refs": [
+        "七時に起きます。"
+      ]
+    },
+    {
+      "id": "seed-also",
+      "grammar_id": "also",
+      "it": "Anche io sono uno studente.",
+      "en": "I am a student too.",
+      "refs": [
+        "私も学生です。"
+      ]
+    },
+    {
+      "id": "seed-past",
+      "grammar_id": "past",
+      "it": "Ieri ho bevuto acqua.",
+      "en": "I drank water yesterday.",
+      "refs": [
+        "昨日水を飲みました。"
+      ]
+    },
+    {
+      "id": "seed-verb-negative",
+      "grammar_id": "verb-negative",
+      "it": "Non bevo caffè.",
+      "en": "I do not drink coffee.",
+      "refs": [
+        "コーヒーを飲みません。"
+      ]
+    },
+    {
+      "id": "seed-past-negative",
+      "grammar_id": "past-negative",
+      "it": "Ieri non sono andato a scuola.",
+      "en": "I did not go to school yesterday.",
+      "refs": [
+        "昨日学校に行きませんでした。"
+      ]
+    },
+    {
+      "id": "seed-request",
+      "grammar_id": "request",
+      "it": "Per favore, guarda questo libro.",
+      "en": "Please look at this book.",
+      "refs": [
+        "この本を見てください。"
+      ]
+    },
+    {
+      "id": "seed-progressive",
+      "grammar_id": "progressive",
+      "it": "Sto leggendo un libro.",
+      "en": "I am reading a book.",
+      "refs": [
+        "本を読んでいます。"
+      ]
+    },
+    {
+      "id": "seed-invitation",
+      "grammar_id": "invitation",
+      "it": "Vuoi bere un tè insieme?",
+      "en": "Would you like to have tea together?",
+      "refs": [
+        "一緒にお茶を飲みませんか。"
+      ]
+    },
+    {
+      "id": "seed-desire",
+      "grammar_id": "desire",
+      "it": "Voglio andare in Giappone.",
+      "en": "I want to go to Japan.",
+      "refs": [
+        "日本に行きたいです。"
+      ]
+    },
+    {
+      "id": "seed-existence",
+      "grammar_id": "existence",
+      "it": "C’è un libro sul tavolo.",
+      "en": "There is a book on the table.",
+      "refs": [
+        "テーブルの上に本があります。"
+      ]
+    },
+    {
+      "id": "seed-animate",
+      "grammar_id": "animate",
+      "it": "C’è un gatto a casa.",
+      "en": "There is a cat at home.",
+      "refs": [
+        "家に猫がいます。"
+      ]
+    },
+    {
+      "id": "seed-i-adjective",
+      "grammar_id": "i-adjective",
+      "it": "Questo è un libro nuovo.",
+      "en": "This is a new book.",
+      "refs": [
+        "これは新しい本です。"
+      ]
+    },
+    {
+      "id": "seed-na-adjective",
+      "grammar_id": "na-adjective",
+      "it": "Questa è una città tranquilla.",
+      "en": "This is a quiet town.",
+      "refs": [
+        "ここは静かな町です。"
+      ]
+    },
+    {
+      "id": "seed-adjective-negative",
+      "grammar_id": "adjective-negative",
+      "it": "Questo libro non è costoso.",
+      "en": "This book is not expensive.",
+      "refs": [
+        "この本は高くないです。"
+      ]
+    },
+    {
+      "id": "seed-because",
+      "grammar_id": "because",
+      "it": "Fa freddo, quindi non esco.",
+      "en": "It is cold, so I will not go out.",
+      "refs": [
+        "寒いですから、出かけません。"
+      ]
+    },
+    {
+      "id": "seed-like",
+      "grammar_id": "like",
+      "it": "Mi piacciono i gatti.",
+      "en": "I like cats.",
+      "refs": [
+        "猫が好きです。"
+      ]
+    },
+    {
+      "id": "seed-from-to",
+      "grammar_id": "from-to",
+      "it": "Lavoro dalle nove alle cinque.",
+      "en": "I work from nine to five.",
+      "refs": [
+        "九時から五時まで働きます。"
+      ]
+    }
+  ],
+  "vocabulary": [
+    "私",
+    "学生",
+    "先生",
+    "これ",
+    "此れ",
+    "本",
+    "りんご",
+    "林檎",
+    "食べる",
+    "学校",
+    "行く",
+    "家",
+    "読む",
+    "七",
+    "時",
+    "起きる",
+    "昨日",
+    "水",
+    "飲む",
+    "コーヒー",
+    "珈琲",
+    "この",
+    "此の",
+    "見る",
+    "一緒",
+    "お茶",
+    "御茶",
+    "茶",
+    "日本",
+    "テーブル",
+    "上",
+    "ある",
+    "有る",
+    "居る",
+    "いる",
+    "猫",
+    "新しい",
+    "ここ",
+    "此処",
+    "静か",
+    "町",
+    "高い",
+    "寒い",
+    "出かける",
+    "出掛ける",
+    "好き",
+    "九",
+    "五",
+    "働く",
+    "です",
+    "だ",
+    "ます",
+    "ない",
+    "ぬ",
+    "ん",
+    "する",
+    "為る",
+    "一",
+    "二",
+    "三",
+    "四",
+    "六",
+    "八",
+    "十",
+    "人",
+    "日",
+    "月",
+    "火",
+    "木",
+    "金",
+    "土",
+    "年",
+    "円",
+    "百",
+    "千",
+    "万",
+    "大",
+    "小",
+    "中",
+    "下",
+    "前",
+    "後",
+    "今",
+    "毎",
+    "朝",
+    "夜",
+    "何",
+    "誰",
+    "どこ",
+    "どれ",
+    "それ",
+    "あれ",
+    "あなた",
+    "彼",
+    "彼女",
+    "友達",
+    "兄",
+    "姉",
+    "母",
+    "父",
+    "子供",
+    "男",
+    "女",
+    "犬",
+    "車",
+    "電車",
+    "駅",
+    "店",
+    "国",
+    "外",
+    "右",
+    "左",
+    "北",
+    "南",
+    "東",
+    "西",
+    "白い",
+    "黒い",
+    "赤い",
+    "青い",
+    "安い",
+    "古い",
+    "良い",
+    "いい",
+    "美味しい",
+    "おいしい",
+    "大きい",
+    "小さい",
+    "長い",
+    "短い",
+    "暑い",
+    "多い",
+    "少ない",
+    "早い",
+    "来る",
+    "帰る",
+    "買う",
+    "聞く",
+    "書く",
+    "話す",
+    "寝る",
+    "勉強",
+    "今日",
+    "明日",
+    "朝ご飯",
+    "ご飯",
+    "牛乳",
+    "パン",
+    "魚",
+    "肉",
+    "野菜",
+    "果物",
+    "卵",
+    "お金",
+    "名前",
+    "英語",
+    "日本語",
+    "きれい",
+    "綺麗",
+    "元気",
+    "便利",
+    "とても",
+    "よく",
+    "いつも",
+    "もう",
+    "まだ",
+    "ちょっと",
+    "たくさん",
+    "少し",
+    "一つ",
+    "二つ",
+    "三つ"
+  ],
+  "kanji": [
+    "一",
+    "二",
+    "三",
+    "四",
+    "五",
+    "六",
+    "七",
+    "八",
+    "九",
+    "十",
+    "百",
+    "千",
+    "万",
+    "日",
+    "月",
+    "火",
+    "水",
+    "木",
+    "金",
+    "土",
+    "年",
+    "時",
+    "分",
+    "今",
+    "毎",
+    "朝",
+    "夜",
+    "人",
+    "男",
+    "女",
+    "子",
+    "父",
+    "母",
+    "友",
+    "先",
+    "生",
+    "学",
+    "大",
+    "小",
+    "中",
+    "上",
+    "下",
+    "左",
+    "右",
+    "前",
+    "後",
+    "東",
+    "西",
+    "南",
+    "北",
+    "国",
+    "本",
+    "名",
+    "語",
+    "校",
+    "山",
+    "川",
+    "田",
+    "天",
+    "気",
+    "雨",
+    "白",
+    "赤",
+    "青",
+    "黒",
+    "新",
+    "古",
+    "高",
+    "安",
+    "長",
+    "多",
+    "少",
+    "食",
+    "飲",
+    "見",
+    "聞",
+    "読",
+    "書",
+    "話",
+    "行",
+    "来",
+    "帰",
+    "買",
+    "休",
+    "何",
+    "半",
+    "円",
+    "電",
+    "車",
+    "駅",
+    "店",
+    "外",
+    "間",
+    "入",
+    "出",
+    "手",
+    "足",
+    "目",
+    "口",
+    "耳",
+    "力",
+    "花",
+    "魚",
+    "肉",
+    "犬",
+    "猫",
+    "好",
+    "き",
+    "寒",
+    "働",
+    "私",
+    "静",
+    "町",
+    "起",
+    "昨",
+    "茶"
+  ]
+}

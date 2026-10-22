@@ -1,0 +1,40 @@
+{
+  "sources": [
+    {
+      "name": "jmdict-subset-20261019",
+      "kind": "jmdict",
+      "file": "jmdict-subset.json.gz",
+      "sha256": "e9ca8feeb16f4bedfd76f38334e615f3b94b0af51e3f8a30c5f5bca0fff36572",
+      "license": "CC-BY-SA-4.0",
+      "url": "https://github.com/scriptin/jmdict-simplified/releases/tag/3.6.2%2B20261019180022",
+      "attribution": "James William Breen and EDRDG; scriptin JSON conversion; subset selected by N5 trainer"
+    },
+    {
+      "name": "kanjidic-subset-20261019",
+      "kind": "kanjidic",
+      "file": "kanjidic-subset.json.gz",
+      "sha256": "282b92d54f535f34b7f72363f990b37bb755fbc48c717229ca4fd4a16ece6420",
+      "license": "CC-BY-SA-4.0",
+      "url": "https://github.com/scriptin/jmdict-simplified/releases/tag/3.6.2%2B20261019180022",
+      "attribution": "James William Breen and EDRDG; scriptin JSON conversion; subset selected by N5 trainer"
+    },
+    {
+      "name": "tanos-vocabulary-mirror-20261021",
+      "kind": "tanos",
+      "file": "tanos-n5.tsv",
+      "sha256": "cd6894cce4ce7a37a0c282e1e71a80f72db8e6179674e8a07c94eb4f3212e686",
+      "license": "CC-BY (upstream version unspecified); MIT mirror",
+      "url": "https://github.com/elzup/jlpt-word-list/blob/master/src/n5.csv",
+      "attribution": "Jonathan Waller / Tanos; chyyran/jlpt-anki-decks; Jamie Sinclair; elzup; spelling/reading subset"
+    },
+    {
+      "name": "tatoeba-curated-20261021",
+      "kind": "tatoeba",
+      "file": "tatoeba.tsv",
+      "sha256": "c69231ee16e3ad87504918d505e5c259915f8606f6729c18b3b9b455575c9a7d",
+      "license": "CC-BY-2.0-FR",
+      "url": "https://tatoeba.org/en/downloads",
+      "attribution": "Tatoeba: mookeee, bunbuku, CK, Pharamp; per-row IDs/authors retained"
+    }
+  ]
+}
