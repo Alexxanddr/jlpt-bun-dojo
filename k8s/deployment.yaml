@@ -21,7 +21,7 @@ spec:
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: trainer
-          image: jlpt-bun-dojo:local
+          image: ghcr.io/alexxanddr/jlpt-bun-dojo:latest-mcp
           ports: [{containerPort: 8000}]
           envFrom:
             - configMapRef: {name: jlpt-bun-dojo}

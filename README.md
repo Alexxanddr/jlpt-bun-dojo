@@ -210,7 +210,7 @@ checksum-verified, and never call dictionary services at runtime.
 The manifests describe a single-replica deployment with persistent SQLite storage:
 
 ```bash
-docker build -t jlpt-bun-dojo:local .
+docker build --target mcp -t jlpt-bun-dojo:local .
 kubectl create secret generic jlpt-bun-dojo --from-env-file=.env
 kubectl apply -k k8s
 kubectl port-forward service/jlpt-bun-dojo 8000:8000
@@ -218,7 +218,9 @@ kubectl port-forward service/jlpt-bun-dojo 8000:8000
 
 The example Secret is not included by Kustomize. Use a secret manager, HTTPS,
 `COOKIE_SECURE=true`, and an appropriate Ingress in production. Verify filesystem
-locking before putting SQLite on network storage.
+locking before putting SQLite on network storage. The checked-in Deployment uses the
+published `latest-mcp` image; provide `BUNPRO_API_TOKEN` and `WANIKANI_API_TOKEN` in
+the Secret when enabling weakness synchronization.
 
 ## Development and validation
 

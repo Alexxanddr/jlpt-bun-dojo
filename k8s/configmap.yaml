@@ -11,3 +11,7 @@ data:
   EVALUATION_PROVIDER: openai
   GENERATION_MODEL: local-model
   EVALUATION_MODEL: local-model
+  BUNPRO_MCP_COMMAND: /usr/local/bin/bunpro-mcp-server
+  BUNPRO_MCP_ARGS: '[]'
+  WANIKANI_MCP_COMMAND: /usr/local/bin/kani-mcp-server
+  WANIKANI_MCP_ARGS: '[]'

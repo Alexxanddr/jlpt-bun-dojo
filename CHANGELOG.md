@@ -2,6 +2,11 @@
 
 All notable changes to JLPT Bun Dojo are documented here.
 
+## Unreleased
+
+- Publish a dedicated MCP container image and use it in Kubernetes so the Bunpro and
+  WaniKani server executables are available at runtime.
+
 ## 0.1.4 - 2026-10-22
 
 - Added application screenshots and one-click Render deployment documentation.
