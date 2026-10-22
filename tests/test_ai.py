@@ -43,6 +43,21 @@ def test_no_free_text_fallback(content):
         asyncio.run(AIClient(Settings(), transport).generate("it", {}, []))
 
 
+def test_invalid_structured_response_is_retried_once():
+    calls = []
+
+    def handle(request):
+        calls.append(request)
+        content = "not json" if len(calls) == 1 else evaluation().model_dump_json()
+        return httpx.Response(200, json={"choices": [
+            {"finish_reason": "stop", "message": {"content": content}}]})
+
+    result = asyncio.run(AIClient(Settings(), httpx.MockTransport(handle)).evaluate(
+        "it", "Sono uno studente.", "学生です。", {}, {}))
+    assert result.accepted
+    assert len(calls) == 2
+
+
 def test_split_providers(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
     seen = []

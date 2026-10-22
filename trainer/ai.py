@@ -60,32 +60,38 @@ class AIClient:
         }
         if provider == "openrouter":
             payload["provider"] = {"require_parameters": True}
-        try:
-            async with httpx.AsyncClient(timeout=60, follow_redirects=False, transport=self.transport) as client:
-                async with client.stream("POST", base + "/chat/completions", headers=headers, json=payload) as r:
-                    r.raise_for_status()
-                    body = bytearray()
-                    async for chunk in r.aiter_bytes():
-                        body.extend(chunk)
-                        if len(body) > 262144:
-                            raise AIError("invalid_provider_response")
-            response = json.loads(body)
-            choice = response["choices"][0]
-            if choice.get("finish_reason") != "stop":
-                raise AIError("invalid_provider_response")
-            return schema.model_validate_json(choice["message"]["content"])
-        except httpx.HTTPStatusError as exc:
-            logger.warning("AI HTTP error: purpose=%s provider=%s status=%s",
-                           purpose, provider, exc.response.status_code)
-            code = "provider_rate_limited" if exc.response.status_code == 429 else "provider_failed"
-            raise AIError(code) from None
-        except (ValueError, KeyError, IndexError, TypeError, AttributeError) as exc:
-            logger.warning("Invalid AI response: purpose=%s provider=%s type=%s",
-                           purpose, provider, type(exc).__name__)
-            raise AIError("invalid_provider_response") from None
-        except httpx.HTTPError:
-            # Provider bodies may contain credentials or submitted text; never return or log them.
-            raise AIError("provider_failed") from None
+        for attempt in range(2):
+            try:
+                async with httpx.AsyncClient(timeout=60, follow_redirects=False,
+                                             transport=self.transport) as client:
+                    async with client.stream("POST", base + "/chat/completions",
+                                             headers=headers, json=payload) as r:
+                        r.raise_for_status()
+                        body = bytearray()
+                        async for chunk in r.aiter_bytes():
+                            body.extend(chunk)
+                            if len(body) > 262144:
+                                raise AIError("invalid_provider_response")
+                response = json.loads(body)
+                choice = response["choices"][0]
+                if choice.get("finish_reason") != "stop":
+                    raise ValueError("incomplete response")
+                return schema.model_validate_json(choice["message"]["content"])
+            except httpx.HTTPStatusError as exc:
+                logger.warning("AI HTTP error: purpose=%s provider=%s status=%s",
+                               purpose, provider, exc.response.status_code)
+                code = "provider_rate_limited" if exc.response.status_code == 429 else "provider_failed"
+                raise AIError(code) from None
+            except (ValueError, KeyError, IndexError, TypeError, AttributeError) as exc:
+                logger.warning("Invalid AI response: purpose=%s provider=%s type=%s attempt=%s",
+                               purpose, provider, type(exc).__name__, attempt + 1)
+                if attempt == 0:
+                    continue
+                raise AIError("invalid_provider_response") from None
+            except httpx.HTTPError:
+                # Provider bodies may contain credentials or submitted text; never return or log them.
+                raise AIError("provider_failed") from None
+        raise AssertionError("unreachable")
 
     async def generate(self, language, grammar, context, reference=None, difficulty="standard",
                        allowed_kanji="", allowed_vocabulary=None) -> Generated:
