@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: n5-trainer
+  name: jlpt-bun-dojo
 data:
   APP_ORIGIN: http://localhost:8000
   COOKIE_SECURE: 'false'

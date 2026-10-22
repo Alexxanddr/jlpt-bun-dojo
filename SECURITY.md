@@ -27,10 +27,10 @@ channel after publication; do not attach keys, personal sentences or DB files.
   no referrer, camera/microphone/geolocation disabled. HSTS is sent when
   `COOKIE_SECURE=true`; terminate TLS at a trusted proxy and set the exact origin.
 - UI uses `textContent` and DOM creation, never model-generated HTML/innerHTML.
-- API keys exist only in process environment/cluster Secrets. Settings do not accept
-  or return keys. Provider URL is server-controlled, rejects embedded credentials,
-  query strings and non-HTTP schemes, and does not follow redirects. Local-network
-  endpoints are intentional for LM Studio. Never allow untrusted users to edit env.
+- API keys come from process environment/cluster Secrets or authenticated settings.
+  Saved keys are stored server-side and never returned to the browser. Provider URLs
+  reject embedded credentials, query strings and non-HTTP schemes; requests do not
+  follow redirects. Local-network endpoints are intentional for local inference.
 - Model inputs are serialized as user data separate from system instructions. AI
   has no tools, filesystem, database execution or access to other providers' secrets.
   Only strict JSON schema responses passing Pydantic validation are consumed;
@@ -45,7 +45,8 @@ channel after publication; do not attach keys, personal sentences or DB files.
 - Optional MCP calls use a fixed tool allowlist through the official SDK, bounded
   extracted responses and a 25-second total timeout. Child processes receive only
   PATH/platform variables and their own token; stderr is discarded. The administrator
-  must trust installed executables. MCP data is untrusted model context and UI text.
+  must trust installed executables. The MCP image installs versioned public packages
+  during its build. MCP data is untrusted model context and UI text.
 - Dataset update is manual, local-only, checksummed, attributed and transactional;
   manifests cannot escape their directory. No runtime dictionary downloads.
 - Docker is non-root with a read-only app filesystem and no Linux capabilities;
@@ -82,13 +83,14 @@ were reviewed directly. No Cloudflare service is required or used.
 - Authentication secrets live in the process environment; protect process access.
   Python's runtime cannot promise zeroization of secret strings.
 
-### Local validation on 2026-10-21
+### Local validation on 2026-10-22
 
 See [TEST_RESULTS.md](TEST_RESULTS.md) for the actual test matrix and live-provider
-results. Ruff, mypy, 47 pytest checks, JavaScript syntax, dependency audit, both
+results. Ruff, mypy, 51 pytest checks, JavaScript syntax, dependency audit, both
 Docker builds, container HTTP flow, restart persistence and both live MCP
 connections were checked. Local Gemma structured generation/evaluation worked.
 OpenRouter authenticated but its exhausted free daily quota prevented completing
 post-fix live evaluation. No Kubernetes resources were applied and no independent
-Strix penetration test was run. Targeted practice passed after filtering WaniKani inputs against the local N5 lists;
+Strix penetration test was run. Targeted practice passed after filtering Bunpro and
+WaniKani inputs against the local N5 lists;
 finite-corpus membership remains an explicit limitation.

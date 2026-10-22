@@ -1,7 +1,7 @@
 [project]
-name = "it-ja-n5-trainer"
+name = "jlpt-bun-dojo"
 version = "0.1.0"
-description = "Self-hosted Italian/English to Japanese N5 writing practice"
+description = "Self-hosted JLPT N5 Japanese writing practice with deterministic checks and AI feedback"
 requires-python = ">=3.12,<3.14"
 dependencies = [
   "fastapi>=0.119,<1",

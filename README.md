@@ -1,281 +1,220 @@
-# N5 trainer · 書く
+# JLPT Bun Dojo · 文道場
 
-Pratica di produzione attiva del giapponese: leggi un prompt italiano o inglese,
-scrivi la tua frase e ricevi controlli verificabili separati da una valutazione AI.
-Open source, self-hosted, senza telemetria e senza servizi cloud obbligatori.
+[![CI](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/ci.yml/badge.svg)](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/ci.yml)
+[![Docker](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/docker.yml/badge.svg)](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/docker.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg)](https://www.python.org/)
 
-## Avvio locale
+JLPT Bun Dojo is a self-hosted writing trainer for active Japanese production at
+JLPT N5 level. Read a prompt in Italian or English, write the Japanese sentence
+yourself, and receive deterministic language checks alongside clearly separated AI
+feedback.
 
-Richiede Python 3.12 e [uv](https://docs.astral.sh/uv/).
+The application runs locally, stores study history in SQLite, has no telemetry, and
+does not require a cloud AI provider. It supports OpenAI-compatible local servers,
+OpenRouter, and optional Bunpro and WaniKani MCP integrations.
 
-```sh
+> [!IMPORTANT]
+> JLPT does not publish authoritative vocabulary or grammar lists. The bundled seed
+> is a reviewed starter corpus, not a claim of complete N5 coverage or an official
+> JLPT certification tool.
+
+## Features
+
+- Free writing from Italian or English prompts, without multiple-choice answers.
+- Easy, standard, and challenging AI prompts constrained to local N5 data.
+- Sudachi morphological analysis, vocabulary/kanji scope checks, and deterministic
+  duplicate-particle detection.
+- Structured AI evaluation for grammar, vocabulary, register, and intent.
+- Strict JSON Schema responses with no free-text parsing fallback.
+- SM-2 spaced repetition, cram mode, history, grammar journal, and skill radar.
+- Provider, model, endpoint, keys, temperature, and token limits configurable in the UI.
+- Targeted practice based on real Bunpro and WaniKani weaknesses.
+- Italian and English interface and prompt languages.
+- Authentication, origin checks, rate limiting, CSP, secret redaction, and a hardened
+  non-root container.
+
+## Quick start with Docker
+
+Requirements: Docker with Compose v2.
+
+```bash
+git clone https://github.com/Alexxanddr/jlpt-bun-dojo.git
+cd jlpt-bun-dojo
 cp .env.example .env
-# Imposta APP_PASSWORD (casuale, almeno 16 caratteri) e il provider/modello.
+```
+
+Set a strong `APP_PASSWORD` and configure an AI provider in `.env`, then run:
+
+```bash
+docker compose up --build -d --wait
+```
+
+Open <http://localhost:8000> and sign in with `APP_PASSWORD`.
+
+To include the published Bunpro and WaniKani MCP packages:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.mcp.yml \
+  up --build -d --wait
+```
+
+The MCP image installs the public `bunpro-mcp-server` and `kani-mcp-server` packages
+at build time. It does not depend on sibling repositories, host-specific Node paths,
+or bind-mounted `dist` directories.
+
+Docker stores SQLite in the named volume `jlpt-bun-dojo-data`. Override it with
+`TRAINER_DATA_VOLUME` when migrating an existing installation.
+
+## Local development
+
+Requirements: Python 3.12 and [uv](https://docs.astral.sh/uv/).
+
+```bash
+git clone https://github.com/Alexxanddr/jlpt-bun-dojo.git
+cd jlpt-bun-dojo
+cp .env.example .env
 uv sync --frozen
 make dev
 ```
 
-Apri http://localhost:8000 e accedi con `APP_PASSWORD`. Migrazioni e seed vengono
-applicati all'avvio. Il dizionario Sudachi viene installato durante `uv sync`, mai
-scaricato al primo esercizio. Sono inclusi 24 punti grammaticali, con 24 prompt
-bilingui originali, 2 coppie bilingui Tatoeba attribuite, 1.094 voci JMdict, 115 voci
-KANJIDIC2 e vocaboli derivati dal mirror Tanos. Questo seed è un corpus iniziale,
-NON una copertura completa di tutta la grammatica N5.
+Migrations and the bundled seed run automatically on startup. Sudachi and its core
+dictionary are installed from the lockfile; no dictionary is downloaded during an
+exercise.
 
-Per riprodurre le verifiche:
+## Configuration
 
-```sh
-make check
-uv run pip-audit
-```
+The `.env` file provides initial values. Model settings saved through the web UI take
+precedence. Saved API keys are never returned to the browser; leaving a key field
+empty preserves the existing value.
 
-I test usano Sudachi e il rilevatore linguistico reali, SQLite temporaneo, provider HTTP e sessioni MCP simulati:
-non richiedono chiavi e non consumano quota AI. La CI usa lo stesso lockfile.
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `APP_PASSWORD` | Yes | Instance password, at least 16 characters. |
+| `APP_ORIGIN` | Yes | Allowed browser origin, such as `http://localhost:8000`. |
+| `COOKIE_SECURE` | Production | Set to `true` behind HTTPS. |
+| `DATABASE_PATH` | No | SQLite path; defaults to `var/trainer.sqlite3`. |
+| `OPENAI_BASE_URL` | Compatible providers | OpenAI-compatible `/v1` endpoint. |
+| `OPENAI_API_KEY` | Provider-dependent | Key for the compatible endpoint. |
+| `OPENROUTER_API_KEY` | OpenRouter | OpenRouter API key. |
+| `GENERATION_PROVIDER` | No | Initial `openai` or `openrouter` provider. |
+| `GENERATION_MODEL` | No | Initial generation model identifier. |
+| `EVALUATION_PROVIDER` | No | Initial evaluation provider. |
+| `EVALUATION_MODEL` | No | Initial evaluation model identifier. |
+| `BUNPRO_API_TOKEN` | Bunpro MCP | Bunpro frontend bearer token. |
+| `WANIKANI_API_TOKEN` | WaniKani MCP | WaniKani API token. |
 
-## Come usarlo
-
-- **Pratica libera**: scegli lingua, categoria e prepara una frase del dataset.
-  Seleziona “Nuova frase AI” e la difficoltà per generare un esercizio con il provider configurato.
-- **Ripasso in scadenza**: seleziona una frase dovuta secondo SM-2.
-- **Ripasso intensivo**: ripete una frase studiata senza spostare le scadenze.
-- **Punti deboli MCP**: sincronizza nelle impostazioni, poi genera una frase con le
-  evidenze recuperate. La frase deve usare almeno un punto WaniKani N5 selezionato;
-  l'interfaccia mostra il punto di studio invece della risposta tecnica del server.
-- Mostrare un esempio registra un aiuto lato server e limita il voto SM-2 a 2.
-- Storico e quaderno grammaticale conservano feedback, punto grammaticale ed evidenze MCP.
-  “Ripassato” chiude una voce; una nuova osservazione la riapre.
-- Il radar rappresenta dati reali delle prove: medie AI per grammatica/lessico/registro,
-  quota di punti grammaticali provati, prove senza aiuto e ripassi riusciti. Non è una
-  certificazione linguistica. Le evidenze MCP sono mostrate separatamente, senza
-  convertire arbitrariamente percentuali di servizi diversi nei punteggi del radar.
-
-## Configurazione AI
-
-La lingua del prompt generato viene controllata localmente con Lingua, limitato
-ad italiano e inglese. Se viene riconosciuta una lingua diversa, il generatore
-riprova una volta mantenendo il significato dei riferimenti giapponesi; dopo un
-secondo risultato errato l’esercizio non viene salvato. Frasi brevissime condivise
-tra le due lingue possono rimanere ambigue.
-
-Entrambi i provider devono supportare `response_format: json_schema` in modalità
-strict. Output non conforme, rifiuti, timeout e risposte troncate producono un errore
-esplicito; non esiste fallback a parsing di testo libero. Modelli e provider di
-generazione/valutazione sono indipendenti. Provider, modelli, temperature, limiti
-token, endpoint e chiavi sono modificabili nella UI autenticata.
-
-### LM Studio / qualsiasi endpoint compatibile
-
-Avvia il server OpenAI-compatible e carica un modello con supporto structured output.
-Imposta l'identificativo reale del modello, non il segnaposto:
+For a model running on the Docker host:
 
 ```dotenv
-OPENAI_BASE_URL=http://localhost:1234/v1
-OPENAI_API_KEY=
+OPENAI_BASE_URL=http://host.docker.internal:1234/v1
 GENERATION_PROVIDER=openai
-GENERATION_MODEL=identificativo-del-modello
+GENERATION_MODEL=your-local-model
 EVALUATION_PROVIDER=openai
-EVALUATION_MODEL=identificativo-del-modello
+EVALUATION_MODEL=your-local-model
 ```
 
-Un endpoint remoto dovrebbe usare HTTPS. Chiavi opzionali per endpoint locali;
-se richieste imposta `OPENAI_API_KEY`. Il `.env` fornisce i valori iniziali, che puoi
-poi sostituire nella UI. Le chiavi salvate non vengono mai restituite al browser;
-lascia il campo vuoto per conservarle. Non mettere credenziali nell'URL.
+Both models must support strict `response_format: json_schema`. OpenRouter's free
+router may select different backends and remains subject to its daily quota.
 
-### OpenRouter / provider separati
+## MCP weakness targeting
 
-```dotenv
-OPENROUTER_API_KEY=la-tua-chiave
-GENERATION_PROVIDER=openai
-GENERATION_MODEL=modello-locale
-EVALUATION_PROVIDER=openrouter
-EVALUATION_MODEL=provider/modello-con-json-schema
-```
+Supported servers:
 
-`openrouter/free` resta soggetto alla quota gratuita giornaliera e può selezionare
-modelli diversi. L'app richiede provider che dichiarano supporto ai parametri inviati,
-ribadisce lo schema nel prompt e valida comunque ogni risposta. Un HTTP 429 viene
-segnalato come limite del provider; una risposta fuori schema non viene salvata.
+- [bunpro-mcp-server](https://github.com/Alexxanddr/bunpro-mcp-server)
+- [kani-mcp-server](https://github.com/Alexxanddr/kani-mcp-server)
 
-Se hai già salvato le impostazioni nella UI, queste hanno precedenza sui valori
-iniziali `GENERATION_*` / `EVALUATION_*` dell'ambiente. Per invertirli usa la UI.
-Solo prompt, risposta, grammatica e analisi vengono inviati al provider selezionato.
-Non vengono inviati password, token MCP o chiavi di altri provider. Le politiche di
-retention del provider restano di sua competenza.
+Bunpro uses `get_weak_items` for ranked grammar and vocabulary weaknesses. WaniKani
+uses review statistics below 80% and resolves subject details. Before data reaches
+the model, the application keeps bounded factual fields, rejects radicals and
+out-of-scope items, admits Bunpro grammar marked N5, checks vocabulary and kanji
+against local N5 data, balances sources/item types, and verifies that generated
+references use a selected target term.
 
-Documentazione: [structured outputs OpenRouter](https://openrouter.ai/docs/guides/features/structured-outputs).
+MCP content is treated as untrusted data, never as model instructions. The app works
+normally with both integrations disabled.
 
-## Pipeline di grading e limiti linguistici
-
-```mermaid
-flowchart LR
-    UI[Prompt IT/EN e risposta JA] --> API[FastAPI autenticata]
-    API --> DB[(SQLite: corpus e storico)]
-    API --> S[Normalizzazione NFKC e Sudachi]
-    S --> D[Liste locali e regole certe]
-    D --> AI[Valutazione JSON schema]
-    AI --> F[Feedback separato: verifiche e suggerimenti AI]
-    F --> DB
-    DB --> R[SM-2, journal e radar]
-    MCP[MCP opzionale stdio] --> API
-```
-
-1. Normalizzazione NFKC; tokenizzazione morfologica SudachiPy con dizionario core,
-   forma dizionario, forma normalizzata, lettura, POS e informazioni di flessione.
-2. Appartenenza a liste locali di kanji e lemmi; similarità Jaccard su lemmi rispetto
-   alle varianti, indipendente dall'ordine; controllo di particelle di caso duplicate.
-   Solo quest'ultimo è un errore grammaticale certo. Il livello lessicale è una
-   proprietà della lista scelta, non una prova di correttezza. Le liste JLPT sono
-   convenzioni didattiche; non si converte automaticamente il vecchio JLPT 4 in N5.
-3. Il modello riceve la tokenizzazione e i controlli, valuta intento/registro e dà
-   suggerimenti su particelle, flessione e ordine. Tutti i punteggi sono AI; un
-   suggerimento non diventa un errore deterministico. Varianti naturali, pronomi
-   omessi, kana e sinonimi devono essere accettati quando rispettano l'intento.
-
-Non è possibile certificare in generale particelle, tutte le coniugazioni ammesse
-N5 e equivalenza semantica con una lista o una similarità di lemmi. Non vengono
-inventati hard fail per soddisfare artificialmente questo requisito. Il target
-morfologico è comunicato al modello, ma il controllo contestuale rimane probabilistico.
-Per i riferimenti generati, i vocaboli già riconosciuti come N5 con kanji fuori
-lista vengono resi in kana usando la lettura morfologica, preservando la flessione.
-I prestiti restano in katakana. I vocaboli non riconosciuti non vengono mascherati:
-il generatore riceve i motivi dello scarto e ha un secondo tentativo, condiviso
-con il controllo della lingua. Dopo due tentativi non validi l’esercizio non è salvato.
-
-Le frasi AI sono filtrate contro le liste locali per **tutte** le varianti prima di
-salvarle, ma non sono revisionate da un insegnante. Con il solo starter set il filtro
-può respingere spesso le generazioni: importa le liste estese.
-
-SM-2 usa il punteggio minimo dei quattro assi: se la risposta è accettata, qualità
-3–5; altrimenti 0–2. Errori certi impediscono l'accettazione. Fallimenti ripartono
-con intervallo di un giorno; successi passano a 1, 6 e poi `ceil(intervallo × ease)`.
-Gli aiuti impongono qualità ≤2. Il cram non modifica SM-2.
-
-## Dati
-
-Vedi [DATA_SOURCES.md](DATA_SOURCES.md) e [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
-`make seed` è idempotente; `make update-data MANIFEST=imports/manifest.json` importa
-snapshot verificati senza rete e senza sovrascrivere tentativi o ripassi. Non vengono
-interrogati Jisho o altri dizionari a runtime. I sottoinsiemi attribuiti vengono importati nel seed automaticamente;
-l’importazione completa richiede snapshot aggiuntivi e revisione delle mappature.
-
-## Docker
-
-```sh
-cp .env.example .env
-# Configura password e modelli. Per LM Studio sull'host:
-# OPENAI_BASE_URL=http://host.docker.internal:1234/v1
-# Abilita l'ascolto LAN nel server locale e limita l'accesso con il firewall.
-docker compose up --build -d
-docker compose logs trainer
-```
-
-Apri http://localhost:8000. Il volume `trainer-data` conserva SQLite; il processo gira
-come UID 10001, filesystem applicativo in sola lettura, capabilities rimosse. Per
-importare snapshot nel container, copia i file in una cartella montata in sola lettura
-tramite override Compose e lancia `python -m trainer.import_data /imports/manifest.json`.
-
-Per usare entrambi gli MCP anche in Docker, costruisci prima i bundle dei server
-(vedi sotto), poi usa l'overlay che aggiunge Node e monta i bundle in sola lettura:
-
-```sh
-docker compose -f docker-compose.yml -f docker-compose.mcp.yml up --build -d
-```
-
-I percorsi predefiniti sono `../bunpro-mcp-server/dist` e `../kani-mcp-server/dist`.
-Se i repository si trovano altrove, imposta `BUNPRO_MCP_DIST` e `WANIKANI_MCP_DIST`
-nel `.env`. L'overlay sostituisce i comandi/percorso host con quelli Linux del
-container, mantenendo i token nel `.env`. Non installa pacchetti npm a runtime.
-Abilita MCP nelle impostazioni e sincronizza. Senza MCP resta sufficiente il Compose base.
-
-## Kubernetes
-
-```sh
-docker build -t n5-trainer:local .
-# Per kind: kind load docker-image n5-trainer:local
-# Per altri cluster: pubblica l'immagine nel tuo registry e cambia deployment.yaml.
-kubectl create secret generic n5-trainer --from-env-file=.env
-kubectl apply -k k8s
-kubectl port-forward service/n5-trainer 8000:8000
-```
-
-`secret.example.yaml` è solo un esempio e non viene applicato da Kustomize. Per
-produzione distribuisci i segreti tramite il gestore del cluster, usa HTTPS,
-`APP_ORIGIN=https://tuo-host`, `COOKIE_SECURE=true` e imposta un Ingress coerente.
-Il Service è ClusterIP. Non c'è un Ingress predefinito perché dominio e controller
-sono specifici dell'installazione. Una replica con strategia Recreate evita accessi
-SQLite da più pod. Serve un filesystem persistente che supporti locking SQLite;
-non usare un PVC NFS senza verificarne la compatibilità con WAL.
-
-Prima di aggiornare: ferma il pod/app, fai una copia del volume completo e conserva
-il vecchio tag immagine. Le migrazioni sono incrementali e non includono downgrade
-automatici. Per un backup live usa l'API `sqlite3.Connection.backup`, non copiare il
-solo file principale mentre WAL è attivo.
-
-## MCP opzionale
-
-Server supportati:
-[Bunpro](https://github.com/Alexxanddr/bunpro-mcp-server) e
-[WaniKani](https://github.com/Alexxanddr/kani-mcp-server).
-
-Su host puoi avviare i pacchetti pubblici con `npx`; l'immagine Docker MCP installa
-direttamente le versioni pubblicate nei registry e non dipende da checkout o directory
-`dist` locali. L'app avvia ogni server via stdio su richiesta di sincronizzazione,
-inizializza la sessione, legge gli strumenti consentiti e chiude il processo.
+For host execution, configure the published packages directly:
 
 ```dotenv
 BUNPRO_MCP_COMMAND=npx
 BUNPRO_MCP_ARGS=["-y","bunpro-mcp-server"]
-BUNPRO_API_TOKEN=token-bunpro
+BUNPRO_API_TOKEN=your-token
 WANIKANI_MCP_COMMAND=npx
 WANIKANI_MCP_ARGS=["-y","kani-mcp-server"]
-WANIKANI_API_TOKEN=token-wanikani
+WANIKANI_API_TOKEN=your-token
 ```
 
-Abilita MCP nella UI, salva e sincronizza. Bunpro usa `get_weak_items` per ottenere
-fino a 15 punti grammaticali e 15 vocaboli ordinati per debolezza; WaniKani usa
-`list_review_statistics` sotto l'80% e risolve i primi 10 subject tramite
-`get_resource`. Gli schemi dei servizi possono cambiare: un risultato vuoto non
-viene trasformato in statistiche inventate. Le evidenze identificano la provenienza;
-solo i dati riconosciuti sono passati al generatore, sempre come input non fidato.
-I punti Bunpro e WaniKani vengono filtrati per appartenenza alle liste locali N5
-prima della generazione: radicali, grammatica sopra N5 e vocaboli fuori perimetro
-non vengono inviati al modello.
-Se non rimangono punti compatibili, la UI lo segnala senza una chiamata AI.
-L'app funziona normalmente con entrambi i server disabilitati.
+Enable MCP in Settings and select **Sync weaknesses** before targeted practice.
 
-## Scelte tecniche
+## How grading works
 
-- **Singola applicazione** Python/FastAPI con frontend HTML/CSS/JS nativo. Il nucleo
-  morfologico è Python; non servono due servizi o un framework UI per sei schermate.
-- **SudachiPy + dizionario core**: forma dizionario/POS/flessione reali, installazione
-  riproducibile nel lockfile; niente fallback di tokenizzazione che finga morfologia.
-- **SQLite** rispetto a Postgres: istanza personale, una replica, scritture brevi,
-  corpus consultato localmente e setup senza servizio DB. I dizionari sono importati
-  a flusso con ijson. Postgres conviene per più utenti/repliche e scritture concorrenti;
-  un DB documentale non offre benefici per le relazioni tra prove, frasi e ripassi.
-- SQL parametrizzato e migrazioni numerate; accessi DB raccolti in `db.py` e negli
-  handler. Nessun ORM solo per promettere un cambio DB gratuito: per migrare servono
-  repository espliciti, SQLAlchemy/Alembic o query equivalenti, export/import dei dati,
-  test di transazione e gestione condivisa di sessioni, rate limit e lock AI.
-- Font di sistema giapponesi, nessun CDN, nessun tracking, nessuna risorsa remota UI.
-  Blu inchiostro, fondo azzurro carta e campo di scrittura rigato; focus visibili,
-  layout mobile e annunci di stato per lettori di schermo.
-- Voce, dettato, shadowing e KanjiVG sono esclusi: il flusso principale è la scrittura;
-  audio aggiungerebbe permessi, modelli, dati e costi senza migliorare questo nucleo.
+```mermaid
+flowchart LR
+    UI[IT/EN prompt and Japanese answer] --> API[Authenticated FastAPI API]
+    API --> TOK[NFKC and Sudachi analysis]
+    TOK --> RULES[Local deterministic checks]
+    RULES --> AI[Structured AI evaluation]
+    AI --> RESULT[Separated facts and suggestions]
+    RESULT --> DB[(SQLite history, SM-2, journal)]
+    MCP[Bunpro and WaniKani MCP] --> API
+```
 
-## Pubblicazione e CI
+Deterministic findings and probabilistic AI advice stay separate. Missing vocabulary
+is a dataset scope limitation, not proof that valid Japanese is wrong. All generated
+reference variants are checked before saving. The generator gets one corrective retry
+for wrong language, missing weakness targets, or out-of-scope vocabulary.
 
-Il progetto è pronto per un repository autonomo. Non contiene chiavi o dati personali.
-Dopo averlo pubblicato come repository pubblico, la CI esegue lint, mypy, test e
-pip-audit. Il workflow Docker costruisce sulle PR e pubblica su GHCR al push su
-`main` o tag `v*`; i nomi immagine sono convertiti in minuscolo. Imposta la visibilità
-del package GHCR su pubblica se necessario.
+## Data and attribution
 
-Il workflow **Strix security review** è manuale per evitare spesa non richiesta.
-Configura i repository secrets `STRIX_LLM` e `LLM_API_KEY`, poi avvialo da Actions.
-Richiede il completamento del report; un budget esaurito non è un audit passato.
-Il bootstrap usa l'installer ufficiale, che va revisionato/pinnato nel tuo ambiente.
-Non è stato eseguito un pentest Strix durante la generazione del progetto.
+The bundled starter data contains 24 reviewed grammar points, 24 original bilingual
+prompts, 2 attributed bilingual Tatoeba pairs, 1,094 JMdict subset entries, 115
+KANJIDIC2 subset entries, and Tanos-derived N5 mappings.
 
-Vedi [SECURITY.md](SECURITY.md) per threat model e [TEST_RESULTS.md](TEST_RESULTS.md) per esiti reali e limiti delle verifiche.
+See [DATA_SOURCES.md](DATA_SOURCES.md) for provenance and updates and
+[THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for licenses. Imports are manual,
+checksum-verified, and never call dictionary services at runtime.
+
+## Kubernetes
+
+The manifests describe a single-replica deployment with persistent SQLite storage:
+
+```bash
+docker build -t jlpt-bun-dojo:local .
+kubectl create secret generic jlpt-bun-dojo --from-env-file=.env
+kubectl apply -k k8s
+kubectl port-forward service/jlpt-bun-dojo 8000:8000
+```
+
+The example Secret is not included by Kustomize. Use a secret manager, HTTPS,
+`COOKIE_SECURE=true`, and an appropriate Ingress in production. Verify filesystem
+locking before putting SQLite on network storage.
+
+## Development and validation
+
+```bash
+make check
+uv run pip-audit
+docker compose -f docker-compose.yml -f docker-compose.mcp.yml config -q
+kubectl kustomize k8s >/dev/null
+```
+
+Tests use real Sudachi tokenization and language detection with temporary SQLite
+databases and mocked provider/MCP sessions. They require no credentials or AI quota.
+CI runs Ruff, mypy, pytest, and pip-audit from the committed lockfile.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and
+[TEST_RESULTS.md](TEST_RESULTS.md) for contribution, security, and validation details.
+
+## Known limits
+
+- The starter corpus does not cover every pedagogical N5 grammar classification.
+- Valid generated text can be rejected when a word is absent from the local lists.
+- Very short Italian/English expressions may be ambiguous to language detection.
+- Bunpro uses an unofficial frontend API whose response shape may change.
+- In-memory sessions and rate limits require one application worker.
+
+## License
+
+JLPT Bun Dojo is released under the [MIT License](LICENSE). Bundled language data
+retains its original attribution and licensing terms.

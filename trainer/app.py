@@ -38,7 +38,7 @@ async def lifespan(app):
     yield
 
 
-app = FastAPI(title="N5 writing trainer", lifespan=lifespan, docs_url=None, redoc_url=None,
+app = FastAPI(title="JLPT Bun Dojo", lifespan=lifespan, docs_url=None, redoc_url=None,
               openapi_url=None)
 
 

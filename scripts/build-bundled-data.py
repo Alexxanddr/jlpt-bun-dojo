@@ -55,9 +55,9 @@ with (root / "tatoeba.tsv").open("w") as stream:
 base = "https://github.com/scriptin/jmdict-simplified/releases/tag/3.6.2%2B20261019180022"
 entries = [
     ("jmdict-subset-20261019", "jmdict", "jmdict-subset.json.gz", "CC-BY-SA-4.0", base,
-     "James William Breen and EDRDG; scriptin JSON conversion; subset selected by N5 trainer"),
+     "James William Breen and EDRDG; scriptin JSON conversion; subset selected by JLPT Bun Dojo"),
     ("kanjidic-subset-20261019", "kanjidic", "kanjidic-subset.json.gz", "CC-BY-SA-4.0", base,
-     "James William Breen and EDRDG; scriptin JSON conversion; subset selected by N5 trainer"),
+     "James William Breen and EDRDG; scriptin JSON conversion; subset selected by JLPT Bun Dojo"),
     ("tanos-vocabulary-mirror-20261021", "tanos", "tanos-n5.tsv", "CC-BY (upstream version unspecified); MIT mirror",
      "https://github.com/elzup/jlpt-word-list/blob/master/src/n5.csv",
      "Jonathan Waller / Tanos; chyyran/jlpt-anki-decks; Jamie Sinclair; elzup; spelling/reading subset"),

@@ -8,7 +8,7 @@ application's normal history. The `.env` was not modified.
 | --- | --- |
 | Ruff | Passed |
 | mypy | Passed, 10 application modules |
-| pytest | 50 passed; one upstream Starlette HTTPX deprecation warning |
+| pytest | 51 passed; one upstream Starlette HTTPX deprecation warning |
 | JavaScript syntax | Passed |
 | pip-audit | No known vulnerabilities reported |
 | Docker base build | Passed |
@@ -28,12 +28,12 @@ application's normal history. The `.env` was not modified.
 | Answer retry | Same result returned without duplicate attempt |
 | History/statistics | Attempt persisted and counted |
 | Container restart | Attempts retained; old session invalidated |
-| Bunpro MCP | Connected successfully; live ghost Grammar collection was empty |
+| Bunpro MCP | `get_weak_items` connected; 15 grammar and 15 vocabulary records returned |
 | WaniKani MCP | Connected successfully; 30 bounded weakness records, with subject details |
-| MCP from Docker | Both sources available with the MCP image and read-only bundle mounts |
+| MCP from Docker | Both published packages available without host bind mounts |
 | OpenRouter authentication | Key accepted |
 | OpenRouter evaluation | Blocked by HTTP 429: free daily quota exhausted |
-| Targeted AI generation | Passed after filtering WaniKani subjects against local N5 lists; 6 eligible weakness records attached |
+| Targeted MCP selection | 10 balanced N5 records from Bunpro and WaniKani across grammar, kanji and vocabulary |
 
 ## Fixes made after live checks
 
@@ -55,9 +55,9 @@ application's normal history. The `.env` was not modified.
   vocabulary/kanji before generation, excluding radicals. If no eligible subject
   remains, a localized message is returned without calling the model. The live
   targeted test then passed with 6 eligible records.
-- Added an optional Docker MCP target and Compose overlay with Node and mounted
-  prebuilt server bundles. Host-specific Node paths cannot be used inside Linux
-  containers; the overlay supplies container paths.
+- Added a Docker MCP target that installs the versioned public Bunpro and WaniKani
+  packages at build time. It does not depend on sibling repositories or stale bind
+  mounts. Bunpro grammar/vocabulary and WaniKani results are balanced after N5 filtering.
 
 ## Remaining limits
 
@@ -72,6 +72,10 @@ Strix penetration test was performed.
 The application is started using the MCP Compose overlay at http://localhost:8000.
 It uses the configured providers and password. MCP remains an explicit UI setting;
 enable it and sync in Settings when wanted. Smoke-test attempts are separate.
+
+The repository rename was verified with the `jlpt-bun-dojo-data` Docker volume. Eight
+existing attempts and all three migrations remained available after copying from the
+previous volume; the original volume was retained.
 
 ## Regression: generated prompt language
 

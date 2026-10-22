@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: n5-trainer
+  name: jlpt-bun-dojo
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
-    matchLabels: {app: n5-trainer}
+    matchLabels: {app: jlpt-bun-dojo}
   template:
     metadata:
-      labels: {app: n5-trainer}
+      labels: {app: jlpt-bun-dojo}
     spec:
       automountServiceAccountToken: false
       securityContext:
@@ -21,11 +21,11 @@ spec:
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: trainer
-          image: n5-trainer:local
+          image: jlpt-bun-dojo:local
           ports: [{containerPort: 8000}]
           envFrom:
-            - configMapRef: {name: n5-trainer}
-            - secretRef: {name: n5-trainer}
+            - configMapRef: {name: jlpt-bun-dojo}
+            - secretRef: {name: jlpt-bun-dojo}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -47,6 +47,6 @@ spec:
             initialDelaySeconds: 20
       volumes:
         - name: data
-          persistentVolumeClaim: {claimName: n5-trainer}
+          persistentVolumeClaim: {claimName: jlpt-bun-dojo}
         - name: tmp
           emptyDir: {sizeLimit: 64Mi}

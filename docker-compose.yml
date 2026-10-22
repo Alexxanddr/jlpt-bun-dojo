@@ -19,3 +19,4 @@ services:
     restart: unless-stopped
 volumes:
   trainer-data:
+    name: ${TRAINER_DATA_VOLUME:-jlpt-bun-dojo-data}
