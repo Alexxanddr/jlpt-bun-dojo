@@ -22,3 +22,14 @@ def authenticated(client):
     assert r.status_code == 200
     client.headers["x-trainer-request"] = "1"
     return client
+
+
+@pytest.fixture
+def passwordless(tmp_path, monkeypatch):
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "trainer.db"))
+    monkeypatch.delenv("APP_PASSWORD", raising=False)
+    monkeypatch.setenv("APP_ORIGIN", "http://testserver")
+    module.credentials.clear()
+    module.requests_window.clear()
+    with TestClient(module.app) as c:
+        yield c

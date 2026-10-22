@@ -11,9 +11,11 @@ channel after publication; do not attach keys, personal sentences or DB files.
 
 ## Controls implemented
 
-- Instance password required at startup (at least 16 characters); constant-time
+- Optional instance password (at least 16 characters when set); constant-time
   comparison, random 256-bit session tokens, HttpOnly/SameSite=Strict cookies,
   12-hour expiry, logout revocation. Sessions live in memory and reset on restart.
+  An empty or missing `APP_PASSWORD` disables authentication and is intended only
+  for localhost or a trusted private network.
 - Same-origin UI/API; exact configured Origin checks and required custom header on
   mutations; no permissive CORS. `APP_ORIGIN` must match scheme/host/port. The health
   endpoint and static UI are public but contain no user or provider secrets.
@@ -27,7 +29,7 @@ channel after publication; do not attach keys, personal sentences or DB files.
   no referrer, camera/microphone/geolocation disabled. HSTS is sent when
   `COOKIE_SECURE=true`; terminate TLS at a trusted proxy and set the exact origin.
 - UI uses `textContent` and DOM creation, never model-generated HTML/innerHTML.
-- API keys come from process environment/cluster Secrets or authenticated settings.
+- API keys come from process environment/cluster Secrets or web settings.
   Saved keys are stored server-side and never returned to the browser. Provider URLs
   reject embedded credentials, query strings and non-HTTP schemes; requests do not
   follow redirects. Local-network endpoints are intentional for local inference.
@@ -73,7 +75,7 @@ were reviewed directly. No Cloudflare service is required or used.
 - Run end-to-end with your selected LM Studio/OpenRouter model and token-authorized
   MCP servers; automated tests use mocks and don't validate real model quality.
 - Review the full imported corpora, their licenses and N5 mappings before redistribution.
-- Public exposure requires HTTPS and a correctly configured ingress/firewall. The
+- Public exposure requires `APP_PASSWORD`, HTTPS and a correctly configured ingress/firewall. The
   app does not implement password reset, per-user accounts or distributed sessions.
 - MCP response schemas, child-process behavior, DNS and outbound egress are not
   confined by application validation alone. Use an OS/container/network sandbox

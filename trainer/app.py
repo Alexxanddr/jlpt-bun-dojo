@@ -28,10 +28,14 @@ weakness_cache: dict = {"items": [], "unavailable": []}
 ai_lock = asyncio.Lock()
 
 
+def authentication_enabled():
+    return bool(os.getenv("APP_PASSWORD", ""))
+
+
 @asynccontextmanager
 async def lifespan(app):
     password = os.getenv("APP_PASSWORD", "")
-    if len(password) < 16 or password.startswith("replace-"):
+    if password and (len(password) < 16 or password.startswith("replace-")):
         raise RuntimeError("APP_PASSWORD must contain at least 16 characters")
     endpoint_url(os.getenv("OPENAI_BASE_URL", "http://localhost:1234/v1"))
     initialize()
@@ -66,7 +70,7 @@ async def security(request: Request, call_next):
         expected = os.getenv("APP_ORIGIN", "http://localhost:8000")
         if origin and origin != expected:
             return JSONResponse({"detail": "invalid_origin"}, status_code=403)
-        if request.url.path != "/api/login":
+        if authentication_enabled() and request.url.path != "/api/login":
             cookie = request.cookies.get("trainer_session", "")
             if credentials.get(cookie, 0) < time.time():
                 return JSONResponse({"detail": "authentication_required"}, status_code=401)
@@ -150,7 +154,7 @@ def load_settings():
 
 @app.get("/api/settings")
 async def settings():
-    return {"settings": load_settings(), "providers": {
+    return {"settings": load_settings(), "authentication_enabled": authentication_enabled(), "providers": {
         "openai_key_configured": bool(load_settings().openai_api_key),
         "openrouter_key_configured": bool(load_settings().openrouter_api_key),
         "mcp_configured": bool(os.getenv("BUNPRO_MCP_COMMAND") or os.getenv("WANIKANI_MCP_COMMAND")),

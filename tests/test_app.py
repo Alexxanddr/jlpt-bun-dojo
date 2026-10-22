@@ -1,4 +1,8 @@
+import pytest
+from fastapi.testclient import TestClient
+
 from tests.test_ai import evaluation
+from trainer import app as module
 from trainer.ai import AIClient, AIError
 from trainer.db import connect
 from trainer.models import Generated
@@ -10,6 +14,22 @@ def test_auth_origin_headers(client):
     assert client.post("/api/login", json={"password": "x"}, headers={
         "x-trainer-request": "1", "origin": "https://evil.example"}).status_code == 403
     assert client.get("/").headers["content-security-policy"].startswith("default-src 'self'")
+
+
+def test_passwordless_instance_skips_authentication_but_keeps_mutation_header(passwordless):
+    settings = passwordless.get("/api/settings")
+    assert settings.status_code == 200
+    assert settings.json()["authentication_enabled"] is False
+    assert passwordless.get("/api/history").status_code == 200
+    assert passwordless.post("/api/exercises", json={}).status_code == 403
+    assert passwordless.post("/api/exercises", json={}, headers={"x-trainer-request": "1"}).status_code == 200
+
+
+def test_configured_password_still_requires_sixteen_characters(tmp_path, monkeypatch):
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "trainer.db"))
+    monkeypatch.setenv("APP_PASSWORD", "too-short")
+    with pytest.raises(RuntimeError, match="at least 16 characters"), TestClient(module.app):
+        pass
 
 
 def test_attempt_review_cram_journal(authenticated, monkeypatch):

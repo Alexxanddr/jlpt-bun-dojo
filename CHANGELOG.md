@@ -2,6 +2,12 @@
 
 All notable changes to JLPT Bun Dojo are documented here.
 
+## 0.1.3 - 2026-10-22
+
+- Made instance authentication optional when `APP_PASSWORD` is empty or absent.
+- Hid login and logout controls in passwordless mode while retaining origin, request
+  header, rate-limit and input validation protections.
+
 ## 0.1.2 - 2026-10-22
 
 - Fixed inconsistent AI generation and difficulty controls when switching practice modes.

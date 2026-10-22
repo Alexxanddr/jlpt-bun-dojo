@@ -31,7 +31,7 @@ OpenRouter, and optional Bunpro and WaniKani MCP integrations.
 - Provider, model, endpoint, keys, temperature, and token limits configurable in the UI.
 - Targeted practice based on real Bunpro and WaniKani weaknesses.
 - Italian and English interface and prompt languages.
-- Authentication, origin checks, rate limiting, CSP, secret redaction, and a hardened
+- Optional instance authentication, origin checks, rate limiting, CSP, secret redaction, and a hardened
   non-root container.
 
 ## Quick start with Docker
@@ -44,13 +44,15 @@ cd jlpt-bun-dojo
 cp .env.example .env
 ```
 
-Set a strong `APP_PASSWORD` and configure an AI provider in `.env`, then run:
+Configure an AI provider in `.env`. For access beyond your trusted machine or network,
+also set a strong `APP_PASSWORD`. Then run:
 
 ```bash
 docker compose up --build -d --wait
 ```
 
-Open <http://localhost:8000> and sign in with `APP_PASSWORD`.
+Open <http://localhost:8000>. With an empty or missing `APP_PASSWORD`, the app opens
+directly; when a password is configured, sign in with it.
 
 To include the published Bunpro and WaniKani MCP packages:
 
@@ -90,7 +92,7 @@ empty preserves the existing value.
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `APP_PASSWORD` | Yes | Instance password, at least 16 characters. |
+| `APP_PASSWORD` | No | Optional instance password. If set, it must contain at least 16 characters. |
 | `APP_ORIGIN` | Yes | Allowed browser origin, such as `http://localhost:8000`. |
 | `COOKIE_SECURE` | Production | Set to `true` behind HTTPS. |
 | `DATABASE_PATH` | No | SQLite path; defaults to `var/trainer.sqlite3`. |
@@ -151,7 +153,7 @@ Enable MCP in Settings and select **Sync weaknesses** before targeted practice.
 
 ```mermaid
 flowchart LR
-    UI[IT/EN prompt and Japanese answer] --> API[Authenticated FastAPI API]
+    UI[IT/EN prompt and Japanese answer] --> API[FastAPI API]
     API --> TOK[NFKC and Sudachi analysis]
     TOK --> RULES[Local deterministic checks]
     RULES --> AI[Structured AI evaluation]

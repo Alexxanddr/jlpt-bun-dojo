@@ -67,6 +67,7 @@ async function bootstrap() {
   for (const [key, value] of Object.entries(data.providers)) {
     $('provider-status').append(text('dt', t(key)), text('dd', typeof value === 'boolean' ? t(value ? 'configured' : 'notConfigured') : value));
   }
+  $('logout').hidden = !data.authentication_enabled;
   $('login').hidden = true; $('nav').hidden = false; await showView('practice');
 }
 async function showView(next) {
