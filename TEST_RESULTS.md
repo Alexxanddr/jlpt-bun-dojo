@@ -8,7 +8,7 @@ application's normal history. The `.env` was not modified.
 | --- | --- |
 | Ruff | Passed |
 | mypy | Passed, 10 application modules |
-| pytest | 51 passed; one upstream Starlette HTTPX deprecation warning |
+| pytest | 52 passed; one upstream Starlette HTTPX deprecation warning |
 | JavaScript syntax | Passed |
 | pip-audit | No known vulnerabilities reported |
 | Docker base build | Passed |
@@ -34,6 +34,7 @@ application's normal history. The `.env` was not modified.
 | OpenRouter authentication | Key accepted |
 | OpenRouter evaluation | Blocked by HTTP 429: free daily quota exhausted |
 | Targeted MCP selection | 10 balanced N5 records from Bunpro and WaniKani across grammar, kanji and vocabulary |
+| Targeted challenging generation | Three consecutive live runs passed with both MCP servers available |
 
 ## Fixes made after live checks
 
@@ -58,6 +59,8 @@ application's normal history. The `.env` was not modified.
 - Added a Docker MCP target that installs the versioned public Bunpro and WaniKani
   packages at build time. It does not depend on sibling repositories or stale bind
   mounts. Bunpro grammar/vocabulary and WaniKani results are balanced after N5 filtering.
+- Targeted and challenging generation now gets a third corrective attempt. The
+  strict local N5 guard remains unchanged; a regression test verifies the retry count.
 
 ## Remaining limits
 
@@ -66,8 +69,8 @@ select different models, so one successful call would not certify every backend.
 Generative outputs can still be rejected by the finite local N5 list, including in
 targeted practice; the app fails closed rather than admitting unchecked references.
 Only a few real-language samples were evaluated, not a linguistic benchmark.
-No Kubernetes deployment, GitHub Actions run, image-CVE scanner or independent
-Strix penetration test was performed.
+No Kubernetes deployment, image-CVE scanner or independent Strix penetration test
+was performed. GitHub Actions and the GHCR publishing workflow passed for v0.1.0.
 
 The application is started using the MCP Compose overlay at http://localhost:8000.
 It uses the configured providers and password. MCP remains an explicit UI setting;

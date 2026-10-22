@@ -94,7 +94,8 @@ class AIClient:
         error_code = "generated_wrong_language"
         vocabulary = set(allowed_vocabulary) if allowed_vocabulary is not None else None
         kanji = set(allowed_kanji)
-        for _ in range(2):
+        attempts = 3 if context or difficulty == "challenging" else 2
+        for _ in range(attempts):
             result = await self.structured("generation", Generated,
                 f"The prompt field MUST be written entirely in {language_name}, never another language. "
                 "Create one Japanese JLPT N5 writing exercise. "

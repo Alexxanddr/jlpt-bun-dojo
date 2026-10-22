@@ -104,7 +104,7 @@
   "invalid_category": "Categoria non valida.",
   "mcp_disabled": "Abilita MCP nelle impostazioni prima di sincronizzare.",
   "sync_weaknesses_first": "Sincronizza i punti deboli nelle impostazioni prima della pratica mirata.",
-  "generated_outside_dataset": "Il modello non è riuscito a produrre una frase verificabile con le liste N5 locali dopo due tentativi. Riprova o scegli un’altra categoria.",
+  "generated_outside_dataset": "Il modello non è riuscito a produrre una frase verificabile con le liste N5 locali dopo i tentativi disponibili. Riprova o scegli un’altra categoria.",
   "mcp_unavailable": "Uno o più server MCP non sono disponibili. Verifica comandi e token sul server.",
   "noWeaknesses": "Nessun punto debole riconosciuto nella risposta MCP.",
   "not_found": "Esercizio non trovato. Prepara una nuova frase.",

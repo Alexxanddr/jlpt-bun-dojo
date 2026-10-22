@@ -104,7 +104,7 @@
   "invalid_category": "Invalid category.",
   "mcp_disabled": "Enable MCP in settings before syncing.",
   "sync_weaknesses_first": "Sync weaknesses in settings before targeted practice.",
-  "generated_outside_dataset": "The model could not produce a sentence verifiable against the local N5 lists after two attempts. Try again or choose another category.",
+  "generated_outside_dataset": "The model could not produce a sentence verifiable against the local N5 lists after the available retries. Try again or choose another category.",
   "mcp_unavailable": "One or more MCP servers are unavailable. Check server commands and tokens.",
   "noWeaknesses": "No weaknesses recognized in the MCP response.",
   "not_found": "Exercise not found. Prepare a new sentence.",

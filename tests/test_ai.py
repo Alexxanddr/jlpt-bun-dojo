@@ -122,6 +122,19 @@ def test_generation_rejects_persistent_wrong_language():
     assert len(calls) == 2
 
 
+def test_challenging_or_targeted_generation_gets_one_extra_retry():
+    calls = []
+    def handle(request):
+        calls.append(request)
+        return httpx.Response(200, json={"choices": [{"finish_reason": "stop", "message": {
+            "content": Generated(prompt="I like cats.", references=["猫が好きです。"])
+            .model_dump_json()}}]})
+    with pytest.raises(AIError, match="^generated_wrong_language$"):
+        asyncio.run(AIClient(Settings(), httpx.MockTransport(handle)).generate(
+            "it", {}, [{"source": "bunpro", "target": "好き"}], difficulty="challenging"))
+    assert len(calls) == 3
+
+
 @pytest.mark.parametrize("text,language,expected", [
     ("I like cats.", "it", False), ("Mi piacciono i gatti.", "it", True),
     ("I am a student.", "en", True), ("Sono uno studente.", "en", False),
