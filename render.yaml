@@ -1,0 +1,26 @@
+services:
+  - type: web
+    runtime: docker
+    name: jlpt-bun-dojo-demo
+    plan: free
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: APP_PASSWORD
+        value: ""
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: DATABASE_PATH
+        value: /tmp/trainer.sqlite3
+      - key: DEMO_MODE
+        value: "true"
+      - key: GENERATION_PROVIDER
+        value: openrouter
+      - key: EVALUATION_PROVIDER
+        value: openrouter
+      - key: GENERATION_MODEL
+        value: openrouter/free
+      - key: EVALUATION_MODEL
+        value: openrouter/free
+      - key: OPENROUTER_API_KEY
+        sync: false

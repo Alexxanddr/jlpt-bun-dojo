@@ -55,6 +55,9 @@ channel after publication; do not attach keys, personal sentences or DB files.
   Kubernetes disables service-account token mounting and specifies resource limits.
 - No telemetry, analytics, remote fonts or tracking. Pinning uses `uv.lock`; CI
   runs pip-audit against installed locked packages.
+- `DEMO_MODE=true` blocks provider settings, MCP synchronization, history, journal,
+  and statistics. The demo database is still shared and ephemeral; opaque exercise
+  IDs limit access to individual active attempts but do not provide tenant isolation.
 
 ## Verification record
 

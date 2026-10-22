@@ -32,6 +32,16 @@ def authentication_enabled():
     return bool(os.getenv("APP_PASSWORD", ""))
 
 
+def demo_mode():
+    return os.getenv("DEMO_MODE", "false").lower() == "true"
+
+
+def allowed_origin():
+    configured = os.getenv("APP_ORIGIN", "")
+    hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "")
+    return configured or (f"https://{hostname}" if hostname else "http://localhost:8000")
+
+
 @asynccontextmanager
 async def lifespan(app):
     password = os.getenv("APP_PASSWORD", "")
@@ -67,9 +77,15 @@ async def security(request: Request, call_next):
         if request.method != "GET" and request.headers.get("x-trainer-request") != "1":
             return JSONResponse({"detail": "invalid_origin"}, status_code=403)
         origin = request.headers.get("origin")
-        expected = os.getenv("APP_ORIGIN", "http://localhost:8000")
+        expected = allowed_origin()
         if origin and origin != expected:
             return JSONResponse({"detail": "invalid_origin"}, status_code=403)
+        if demo_mode() and (
+            request.url.path in {"/api/history", "/api/journal", "/api/stats", "/api/mcp/sync"}
+            or request.url.path.startswith("/api/journal/")
+            or (request.url.path == "/api/settings" and request.method != "GET")
+        ):
+            return JSONResponse({"detail": "demo_restricted"}, status_code=403)
         if authentication_enabled() and request.url.path != "/api/login":
             cookie = request.cookies.get("trainer_session", "")
             if credentials.get(cookie, 0) < time.time():
@@ -154,7 +170,8 @@ def load_settings():
 
 @app.get("/api/settings")
 async def settings():
-    return {"settings": load_settings(), "authentication_enabled": authentication_enabled(), "providers": {
+    return {"settings": load_settings(), "authentication_enabled": authentication_enabled(),
+            "demo_mode": demo_mode(), "providers": {
         "openai_key_configured": bool(load_settings().openai_api_key),
         "openrouter_key_configured": bool(load_settings().openrouter_api_key),
         "mcp_configured": bool(os.getenv("BUNPRO_MCP_COMMAND") or os.getenv("WANIKANI_MCP_COMMAND")),

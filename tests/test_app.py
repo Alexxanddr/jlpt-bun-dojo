@@ -32,6 +32,17 @@ def test_configured_password_still_requires_sixteen_characters(tmp_path, monkeyp
         pass
 
 
+def test_demo_keeps_practice_but_blocks_shared_data_and_configuration(passwordless, monkeypatch):
+    monkeypatch.setenv("DEMO_MODE", "true")
+    headers = {"x-trainer-request": "1"}
+    assert passwordless.get("/api/settings").json()["demo_mode"] is True
+    assert passwordless.post("/api/exercises", json={}, headers=headers).status_code == 200
+    for path in ("history", "journal", "stats"):
+        assert passwordless.get(f"/api/{path}").status_code == 403
+    assert passwordless.put("/api/settings", json={}, headers=headers).status_code == 403
+    assert passwordless.post("/api/mcp/sync", json={}, headers=headers).status_code == 403
+
+
 def test_attempt_review_cram_journal(authenticated, monkeypatch):
     async def evaluate(*args, **kwargs):
         result = evaluation()

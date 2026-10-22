@@ -2,6 +2,12 @@
 
 All notable changes to JLPT Bun Dojo are documented here.
 
+## 0.1.4 - 2026-10-22
+
+- Added application screenshots and one-click Render deployment documentation.
+- Added a restricted public demo mode that protects shared data and provider settings.
+- Made the container honor Render's dynamic `PORT` while retaining local port 8000.
+
 ## 0.1.3 - 2026-10-22
 
 - Made instance authentication optional when `APP_PASSWORD` is empty or absent.

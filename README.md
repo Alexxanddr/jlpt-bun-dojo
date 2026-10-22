@@ -4,6 +4,7 @@
 [![Docker](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/docker.yml/badge.svg)](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/docker.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg)](https://www.python.org/)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Alexxanddr/jlpt-bun-dojo)
 
 JLPT Bun Dojo is a self-hosted writing trainer for active Japanese production at
 JLPT N5 level. Read a prompt in Italian or English, write the Japanese sentence
@@ -18,6 +19,12 @@ OpenRouter, and optional Bunpro and WaniKani MCP integrations.
 > JLPT does not publish authoritative vocabulary or grammar lists. The bundled seed
 > is a reviewed starter corpus, not a claim of complete N5 coverage or an official
 > JLPT certification tool.
+
+## Screenshots
+
+![Italian writing exercise](docs/screenshots/practice.jpg)
+
+![Progress dashboard and data attribution](docs/screenshots/progress.jpg)
 
 ## Features
 
@@ -84,6 +91,19 @@ Migrations and the bundled seed run automatically on startup. Sudachi and its co
 dictionary are installed from the lockfile; no dictionary is downloaded during an
 exercise.
 
+## Render demo
+
+The included [`render.yaml`](render.yaml) deploys a free, passwordless demo backed by
+OpenRouter's free router. Render prompts for `OPENROUTER_API_KEY`; the key is never
+stored in the repository or built into the image. Demo mode hides and blocks settings,
+MCP synchronization, history, journal, and aggregate statistics so a public visitor
+cannot read another visitor's attempts or change the shared provider configuration.
+
+Render's free filesystem is ephemeral: exercises and attempts disappear on restart,
+redeploy, or idle spin-down. Free services can take about a minute to wake after 15
+minutes without traffic. Use the **Deploy to Render** button above to create your own
+instance.
+
 ## Configuration
 
 The `.env` file provides initial values. Model settings saved through the web UI take
@@ -95,6 +115,7 @@ empty preserves the existing value.
 | `APP_PASSWORD` | No | Optional instance password. If set, it must contain at least 16 characters. |
 | `APP_ORIGIN` | Yes | Allowed browser origin, such as `http://localhost:8000`. |
 | `COOKIE_SECURE` | Production | Set to `true` behind HTTPS. |
+| `DEMO_MODE` | No | Restricts shared-data and configuration endpoints for a public demo. |
 | `DATABASE_PATH` | No | SQLite path; defaults to `var/trainer.sqlite3`. |
 | `OPENAI_BASE_URL` | Compatible providers | OpenAI-compatible `/v1` endpoint. |
 | `OPENAI_API_KEY` | Provider-dependent | Key for the compatible endpoint. |
