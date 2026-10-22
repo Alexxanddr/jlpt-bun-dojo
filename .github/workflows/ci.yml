@@ -15,4 +15,5 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy trainer
       - run: uv run pytest
+      - run: node --test tests/exercise-options.test.mjs
       - run: uv run pip-audit

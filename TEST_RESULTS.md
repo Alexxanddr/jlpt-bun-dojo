@@ -10,6 +10,7 @@ application's normal history. The `.env` was not modified.
 | mypy | Passed, 10 application modules |
 | pytest | 52 passed; one upstream Starlette HTTPX deprecation warning |
 | JavaScript syntax | Passed |
+| Exercise mode UI state | Passed for free, targeted, review and cram transitions |
 | pip-audit | No known vulnerabilities reported |
 | Docker base build | Passed |
 | Docker MCP build | Passed |

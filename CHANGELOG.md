@@ -2,6 +2,12 @@
 
 All notable changes to JLPT Bun Dojo are documented here.
 
+## 0.1.2 - 2026-10-22
+
+- Fixed inconsistent AI generation and difficulty controls when switching practice modes.
+- Locked exercise options while a sentence is being prepared to prevent request/UI state races.
+- Added the exercise-mode state matrix to CI.
+
 ## 0.1.1 - 2026-10-22
 
 - Added a third corrective generation attempt for targeted or challenging exercises

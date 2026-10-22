@@ -1,7 +1,10 @@
+import {exerciseOptions} from './exercise-options.js';
+
 const $ = (id) => document.getElementById(id);
 let ui = localStorage.getItem('ui_language') || 'it';
 if (!['it', 'en'].includes(ui)) ui = 'it';
 let messages = {}, grammar = [], config, current, hinted = false, view = 'practice';
+let newGeneration = false;
 const t = (key) => messages[key] || key;
 const text = (tag, value, cls) => { const e = document.createElement(tag); e.textContent = value; if (cls) e.className = cls; return e; };
 const date = (v) => new Date(v * 1000).toLocaleString(ui);
@@ -18,6 +21,19 @@ async function busy(button, fn) {
   button.disabled = true; notice('working');
   try { await fn(); $('notice').textContent = ''; } catch (error) { notice(error.message); }
   finally { button.disabled = false; }
+}
+async function busyForm(form, fn) {
+  const controls = [...form.elements];
+  controls.forEach(control => { control.disabled = true; });
+  notice('working');
+  try { await fn(); $('notice').textContent = ''; } catch (error) { notice(error.message); }
+  finally { controls.forEach(control => { control.disabled = false; }); syncExerciseOptions(); }
+}
+function syncExerciseOptions() {
+  const state = exerciseOptions($('mode').value, newGeneration);
+  $('generate').checked = state.generate;
+  $('generate').disabled = state.generateDisabled;
+  $('difficulty').disabled = state.difficultyDisabled;
 }
 async function translate(lang) {
   ui = lang; messages = await (await fetch(`/static/locales/${ui}.json`)).json();
@@ -172,8 +188,10 @@ async function stats() {
 $('ui-language').onchange = async e => { await translate(e.target.value); if (config) await showView(view); };
 $('login-form').onsubmit = e => {e.preventDefault(); busy(e.submitter,async()=>{await api('login',{password:$('password').value}); $('password').value=''; await bootstrap();});};
 document.querySelectorAll('[data-view]').forEach(e=> e.onclick=()=>busy(e,()=>showView(e.dataset.view)));
-$('exercise-form').onsubmit = e => {e.preventDefault(); busy(e.submitter,async()=>{
-  current=await api('exercises',{language:$('source-language').value,category:$('category').value,mode:$('mode').value,generate:$('generate').checked,difficulty:$('difficulty').value});
+$('exercise-form').onsubmit = e => {e.preventDefault();
+  const request={language:$('source-language').value,category:$('category').value,mode:$('mode').value,generate:$('generate').checked,difficulty:$('difficulty').value};
+  busyForm(e.currentTarget,async()=>{
+  current=await api('exercises',request);
   hinted=false; $('answer').value=''; $('hint-text').textContent=''; $('char-count').textContent='0 / 500'; $('feedback').hidden=true; $('grade').disabled=false; displayExercise(); $('answer').focus();
 });};
 $('answer').oninput=()=>{$('char-count').textContent=`${$('answer').value.length} / 500`;};
@@ -185,11 +203,8 @@ $('settings-form').onsubmit=e=>{e.preventDefault(); busy(e.submitter,async()=>{
 });};
 $('sync').onclick=()=>busy($('sync'),async()=>{const r=await api('mcp/sync',{}); if(r.unavailable.length) throw new Error('mcp_unavailable'); if(!r.items.length) throw new Error('noWeaknesses');});
 $('logout').onclick=()=>busy($('logout'),async()=>{await api('logout',{}); config=null; showLogin();});
+$('generate').onchange=()=>{newGeneration=$('generate').checked; syncExerciseOptions();};
+$('mode').onchange=syncExerciseOptions;
+syncExerciseOptions();
 await translate(ui);
 try {await bootstrap();} catch(error) {if(error.message!=='authentication_required') notice(error.message);}
-
-$('mode').onchange=()=>{
-  const disabled=['review','cram'].includes($('mode').value);
-  $('generate').disabled=disabled;
-  if(disabled) $('generate').checked=false;
-};
