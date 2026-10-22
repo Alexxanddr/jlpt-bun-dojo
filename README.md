@@ -4,6 +4,7 @@
 [![Docker](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/docker.yml/badge.svg)](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/docker.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg)](https://www.python.org/)
+[![Live demo](https://img.shields.io/badge/Live_demo-Render-46E3B7.svg)](https://jlpt-bun-dojo-demo.onrender.com/)
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Alexxanddr/jlpt-bun-dojo)
 
 JLPT Bun Dojo is a self-hosted writing trainer for active Japanese production at
@@ -92,6 +93,8 @@ dictionary are installed from the lockfile; no dictionary is downloaded during a
 exercise.
 
 ## Render demo
+
+Try the public demo at **[jlpt-bun-dojo-demo.onrender.com](https://jlpt-bun-dojo-demo.onrender.com/)**.
 
 The included [`render.yaml`](render.yaml) deploys a free, passwordless demo backed by
 OpenRouter's free router. Render prompts for `OPENROUTER_API_KEY`; the key is never

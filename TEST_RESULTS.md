@@ -4,6 +4,11 @@ Tests used the administrator's `.env` without printing credentials. Live study
 attempts were stored in separate disposable smoke-test databases/volumes, not the
 application's normal history. The `.env` was not modified.
 
+The public Render demo at <https://jlpt-bun-dojo-demo.onrender.com/> passed its health,
+passwordless bootstrap, demo restriction, and bundled exercise checks. The live
+OpenRouter request reached the provider, then hit the configured account's free-tier
+rate limit.
+
 | Check | Result |
 | --- | --- |
 | Ruff | Passed |
