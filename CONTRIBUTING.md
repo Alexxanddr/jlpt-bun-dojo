@@ -1,5 +1,8 @@
 # Contributing
 
+Read [AGENTS.md](AGENTS.md) first; it is the operational guide and invariant list for
+all human and AI-assisted changes.
+
 Use Python 3.12, `uv sync --frozen`, then `make check`. Keep changes focused and add
 one meaningful regression test for non-trivial behavior. Run `uv run pip-audit`
 when changing dependencies; commit updated `uv.lock`.

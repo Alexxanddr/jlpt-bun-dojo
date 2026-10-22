@@ -1,11 +1,15 @@
 # JLPT Bun Dojo · 文道場
 
+> [!TIP]
+> **[Try the live demo →](https://jlpt-bun-dojo-demo.onrender.com/)**
+> Free Render instances may need about a minute to wake after being idle.
+
 [![CI](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/ci.yml/badge.svg)](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/ci.yml)
 [![Docker](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/docker.yml/badge.svg)](https://github.com/Alexxanddr/jlpt-bun-dojo/actions/workflows/docker.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg)](https://www.python.org/)
 [![Live demo](https://img.shields.io/badge/Live_demo-Render-46E3B7.svg)](https://jlpt-bun-dojo-demo.onrender.com/)
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Alexxanddr/jlpt-bun-dojo)
+[![Deploy to Render](https://img.shields.io/badge/Deploy_to_Render-46E3B7.svg?logo=render&logoColor=black)](https://render.com/deploy?repo=https://github.com/Alexxanddr/jlpt-bun-dojo)
 
 JLPT Bun Dojo is a self-hosted writing trainer for active Japanese production at
 JLPT N5 level. Read a prompt in Italian or English, write the Japanese sentence
@@ -23,7 +27,7 @@ OpenRouter, and optional Bunpro and WaniKani MCP integrations.
 
 ## Screenshots
 
-![Italian writing exercise](docs/screenshots/practice.jpg)
+![English writing exercise](docs/screenshots/practice.jpg)
 
 ![Progress dashboard and data attribution](docs/screenshots/progress.jpg)
 
@@ -232,6 +236,15 @@ CI runs Ruff, mypy, pytest, and pip-audit from the committed lockfile.
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and
 [TEST_RESULTS.md](TEST_RESULTS.md) for contribution, security, and validation details.
 
+## Documentation
+
+- [Agent guide](AGENTS.md) and [functional specification](docs/SPEC.md)
+- [Architecture](docs/ARCHITECTURE.md) and [data model](docs/DATA_MODEL.md)
+- [Grading](docs/GRADING.md), [model prompts](docs/PROMPTS.md), and [providers](docs/MODELS.md)
+- [MCP integration](docs/MCP_INTEGRATION.md) and [independent evaluations](docs/EVALS.md)
+- [Rewrite guide](docs/REWRITE_GUIDE.md), [glossary](docs/GLOSSARY.md),
+  [known issues](docs/KNOWN_ISSUES.md), and [architecture decisions](docs/DECISIONS/)
+
 ## Known limits
 
 - The starter corpus does not cover every pedagogical N5 grammar classification.
@@ -239,6 +252,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and
 - Very short Italian/English expressions may be ambiguous to language detection.
 - Bunpro uses an unofficial frontend API whose response shape may change.
 - In-memory sessions and rate limits require one application worker.
+
+See [Known issues and limits](docs/KNOWN_ISSUES.md) for the expanded list.
 
 ## License
 

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "cases": [
+    {"id":"nfkc","provenance":"derived:tests/test_core.py","kind":"normalize","input":" ＡＢＣ１２３ ","expected":"ABC123"},
+    {"id":"valid-variant","provenance":"derived:tests/test_core.py","kind":"deterministic","answer":"私は学校へ行きます。","references":["学校に行きます。"],"vocabulary":["私","学校","行く"],"kanji":"私学校行","pattern":"N に V","forbidden_findings":["kanji_not_listed","vocabulary_not_listed","duplicate_particle"],"minimum_similarity":0.5},
+    {"id":"scope-only","provenance":"derived:tests/test_core.py","kind":"deterministic","answer":"薔薇を見ます。","references":["花を見ます。"],"vocabulary":["見る"],"kanji":"見","pattern":"N を V","required_severity":"scope"},
+    {"id":"duplicate-particle","provenance":"derived:tests/test_core.py","kind":"deterministic","answer":"本をを読みます。","references":["本を読みます。"],"vocabulary":["本","読む"],"kanji":"本読","pattern":"N を V","required_findings":["duplicate_particle"]},
+    {"id":"sm2-sequence","provenance":"derived:tests/test_core.py","kind":"sm2","qualities":[5,5,5,1],"expected_intervals":[1,6,">6",1],"final_repetitions":0},
+    {"id":"italian-generation-language","provenance":"derived:tests/test_ai.py","kind":"generation","language":"it","reject_prompt":"I like cats.","accept_prompt":"Mi piacciono i gatti.","references":["猫が好きです。"]},
+    {"id":"target-required","provenance":"derived:tests/test_ai.py","kind":"generation","language":"it","target":"学生","reject_reference":"本を見ます。","accept_reference":"学生を見ます。"},
+    {"id":"seed-copula-correct","provenance":"derived:trainer/data/seed.json and tests/test_app.py","kind":"evaluation","prompt_it":"Sono uno studente.","answer":"私は学生です。","must_have_no_hard_findings":true,"ai_acceptance":"human-review"},
+    {"id":"wrong-intent","provenance":"derived:TEST_RESULTS.md","kind":"evaluation","criterion":"An answer unrelated to the source meaning must be rejected even if locally well formed."},
+    {"id":"polite-omitted-pronoun","provenance":"PROPOSAL","kind":"evaluation","prompt_en":"I am a student.","answer":"学生です。","criterion":"Accept omitted subject and polite copula; explain in English."},
+    {"id":"scope-language","provenance":"PROPOSAL","kind":"evaluation","criterion":"When only scope findings exist, feedback must not call the Japanese certainly wrong."}
+  ]
+}
