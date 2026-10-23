@@ -139,5 +139,9 @@
   "modeHelp_targeted": "L’AI usa i punti di studio sincronizzati. Prima salva e sincronizza Bunpro o WaniKani nelle Impostazioni.",
   "provider_incomplete": "Il modello ha raggiunto il limite di output. Aumenta Token massimi nelle Impostazioni oppure usa un modello con risposte più brevi.",
   "demo_restricted": "Questa azione non è disponibile nella demo pubblica.",
-  "navJournal": "Quaderno"
+  "navJournal": "Quaderno",
+  "theme": "Aspetto",
+  "themeSystem": "Sistema",
+  "themeLight": "Chiaro",
+  "themeDark": "Scuro"
 }

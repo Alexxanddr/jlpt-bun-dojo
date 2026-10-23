@@ -139,5 +139,9 @@
   "modeHelp_targeted": "AI uses your synced study items. Save and sync Bunpro or WaniKani in Settings first.",
   "provider_incomplete": "The model reached its output limit. Increase Maximum tokens in Settings, or use a model with shorter output.",
   "demo_restricted": "This action is not available in the public demo.",
-  "navJournal": "Journal"
+  "navJournal": "Journal",
+  "theme": "Appearance",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark"
 }

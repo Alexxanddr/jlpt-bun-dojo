@@ -4,6 +4,9 @@ All notable changes to JLPT Bun Dojo are documented here.
 
 ## Unreleased
 
+- Add persistent light, dark and system appearance modes.
+- Keep the selected interface language across reloads and synchronize explicit settings saves.
+
 - Redesign the study workspace with separate practice options, a focused writing sheet,
   responsive navigation, clearer feedback and bilingual success/error states.
 - Serialize browser operations to prevent mixed exercises, hints and evaluation results;

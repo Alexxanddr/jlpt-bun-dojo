@@ -215,3 +215,28 @@ test('expired session requires login and logout clears the previous exercise',as
   await page.waitForFunction(()=>document.getElementById('notice').textContent.includes('Invalid password'));
   assert.equal(await page.locator('#login-form button').isEnabled(),true);
 });
+
+test('English preference survives bootstrap and theme persists across reloads',async t=>{
+  const page=await setup(t);
+  await page.route('**/api/settings',route=>route.fulfill({json:{settings:{...settings,ui_language:'it'},providers:{},authentication_enabled:false,demo_mode:false}}));
+  await page.reload();
+  await page.locator('#practice').waitFor({state:'visible'});
+  assert.equal(await page.locator('html').getAttribute('lang'),'en');
+  await page.locator('#theme').selectOption('dark');
+  await page.reload();
+  await page.locator('#practice').waitFor({state:'visible'});
+  assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
+  await page.locator('#exercise-form button').click();
+  await page.locator('#exercise').waitFor({state:'visible'});
+  assert.equal(await page.locator('#prompt').getAttribute('lang'),'en');
+  await page.locator('#answer').fill('学生です。');
+  await page.locator('#grade').click();
+  await page.locator('#feedback').waitFor({state:'visible'});
+  await page.screenshot({path:'test-results/dark-desktop.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.screenshot({path:'test-results/dark-mobile.png',fullPage:true});
+  await page.locator('#theme').selectOption('system');
+  await page.emulateMedia({colorScheme:'light'});
+  await page.waitForFunction(()=>document.documentElement.dataset.theme==='light');
+});

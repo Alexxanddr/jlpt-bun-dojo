@@ -170,3 +170,23 @@ footer { margin-top: 48px; padding: 24px 0; font-size: .75rem; color: var(--mute
 #stats-axes strong { font-weight: 400; font-variant-numeric: tabular-nums; text-align: right; }
 
 nav button:hover:not(:disabled) { background: #e4e7e9; border-color: transparent; }
+
+.sidebar-bottom { display: grid; gap: 12px; }
+:root[data-theme=dark] { color-scheme: dark; --ink: #f0f0f0; --muted: #b5b5b5; --blue: #9bc8ed; --teal: #75c9bd; --paper: #181818; --ground: #101010; --line: #363636; --wash: #263632; }
+[data-theme=dark] button, [data-theme=dark] input, [data-theme=dark] select, [data-theme=dark] textarea,
+[data-theme=dark] fieldset, [data-theme=dark] .entry, [data-theme=dark] .stats-layout, [data-theme=dark] #login { background: var(--paper); color: var(--ink); border-color: var(--line); }
+[data-theme=dark] button.primary { background: #75c9bd; color: #102420; }
+[data-theme=dark] button:hover:not(:disabled), [data-theme=dark] nav button[aria-current=page] { background: #303030; color: var(--ink); }
+[data-theme=dark] button:disabled, [data-theme=dark] input:disabled, [data-theme=dark] select:disabled { background: #252525; color: var(--muted); }
+[data-theme=dark] textarea[readonly], [data-theme=dark] #feedback { background: #192421; }
+[data-theme=dark] #feedback[data-accepted=false] { background: #2a2419; border-color: #74603d; }
+[data-theme=dark] #notice { background: #202e38; color: #c3dff3; }
+[data-theme=dark] #notice[data-kind=error] { background: #36221e; color: #ffc2b5; }
+[data-theme=dark] #notice[data-kind=success] { background: #20342e; color: #acdfcf; }
+[data-theme=dark] .level-badge b { background: #26323c; color: #b1d8f6; }
+[data-theme=dark] .brand-mark { color: #102420; }
+[data-theme=dark] .empty-mark { color: var(--teal); }
+[data-theme=dark] #radar text { fill: var(--ink); }
+[data-theme=dark] #radar polygon { stroke: #606060; }
+[data-theme=dark] #radar polygon:last-of-type { stroke: var(--teal); fill: #75c9bd22; }
+@media (max-width: 850px) { .sidebar-bottom { display: flex; gap: 8px; } .sidebar-bottom select { max-width: 110px; } .sidebar { padding-inline: 16px; gap: 8px; } }

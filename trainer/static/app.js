@@ -1,7 +1,9 @@
 import {exerciseOptions} from './exercise-options.js';
 
 const $ = (id) => document.getElementById(id);
-let ui = localStorage.getItem('ui_language') || 'it';
+let preferredUi = localStorage.getItem('ui_language');
+if (!['it', 'en'].includes(preferredUi)) preferredUi = null;
+let ui = preferredUi || 'it';
 if (!['it', 'en'].includes(ui)) ui = 'it';
 let messages = {}, grammar = [], config, current, hinted = false, view = 'practice';
 let newGeneration = false, pending = false, lastResult = null;
@@ -85,13 +87,14 @@ function showLogin() {
 async function bootstrap(next = 'practice') {
   const data = await api('settings'); config = data.settings;
   grammar = await api('grammar'); categories();
-  await translate(config.ui_language);
+  await translate(preferredUi || config.ui_language);
   $('settings-form').reset();
   $('source-language').value = config.language; $('category').value = config.category;
   for (const [key, value] of Object.entries(config)) {
     const el = $('settings-form').elements.namedItem(key);
     if (el) { if (el.type === 'checkbox') el.checked = value; else el.value = value; }
   }
+  $('settings-form').elements.ui_language.value = ui;
   $('provider-status').replaceChildren();
   for (const [key, value] of Object.entries(data.providers)) {
     $('provider-status').append(text('dt', t(key)), text('dd', typeof value === 'boolean' ? t(value ? 'configured' : 'notConfigured') : value));
@@ -224,6 +227,7 @@ async function stats() {
 }
 $('ui-language').onchange = e => {
   const language = e.target.value;
+  preferredUi = language;
   busy(e.target, async () => {
     await translate(language);
     if (config) { $('settings-form').elements.ui_language.value = language; await showView(view); }
@@ -258,6 +262,7 @@ function settingsData() {
 }
 async function saveSettings(data) {
   await api('settings',data,'PUT');
+  preferredUi = data.ui_language;
   await bootstrap('settings');
 }
 $('settings-form').onsubmit=e=>{e.preventDefault();
@@ -288,6 +293,15 @@ const compactLayout = matchMedia('(max-width: 850px)');
 const foldOptions = () => { $('session-options').open = !compactLayout.matches; };
 compactLayout.addEventListener('change', foldOptions);
 foldOptions();
+const themePreference = matchMedia('(prefers-color-scheme: dark)');
+function applyTheme() {
+  const theme = $('theme').value;
+  document.documentElement.dataset.theme = theme === 'system' ? (themePreference.matches ? 'dark' : 'light') : theme;
+}
+$('theme').value = ['light', 'dark'].includes(localStorage.getItem('theme')) ? localStorage.getItem('theme') : 'system';
+$('theme').onchange = () => { localStorage.setItem('theme', $('theme').value); applyTheme(); };
+themePreference.addEventListener('change', applyTheme);
+applyTheme();
 await translate(ui);
 syncExerciseOptions();
 await busy(null, bootstrap);
